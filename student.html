@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en" data-session-guard="student">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' https: data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src https://*.firebaseapp.com;">
+    <meta name="referrer" content="no-referrer">
+    <title>Student Dashboard - Fee Tracker</title>
+    
+    <script src="scripts/shared/session-guard.js"></script>
+    <script src="scripts/shared/page-guards.js"></script>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="assets/images/logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Global CSS Link -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="student-shell">
+    <div id="loading-screen">
+        <div class="loader-wrapper">
+            <div class="logo-container">
+                <div class="circle-loader"></div>
+                <img id="splash-logo-img" src="assets/images/logo.png" alt="Logo">
+            </div>
+            <div class="loading-text">Initializing...</div>
+        </div>
+    </div>
+
+    <!-- Unified Header Matches Public Page -->
+    <header>
+        <div class="nav-container flex justify-between items-center w-full h-full px-4">
+            <div class="header-logo-box">
+                <img id="header-logo" src="assets/images/logo.png" alt="Logo" onerror="this.style.display='none'">
+            </div>
+            
+            <div class="header-center-box absolute left-1/2 -translate-x-1/2 w-[50%] text-center">
+                <h1 id="header-title">Student Dashboard</h1>
+                <p id="header-subtitle" class="hidden"><span id="header-regno"></span> <span id="header-sep" class="mx-1 hidden">|</span> <span id="header-place"></span></p>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3 relative z-[1001] ml-auto">
+                <!-- Notification Bell -->
+                <button id="student-notify-trigger" class="relative text-slate-600 hover:text-blue-600 transition p-2 focus:outline-none rounded-full hover:bg-slate-50 cursor-pointer" title="Notifications">
+                    <i class="fas fa-bell text-[20px] sm:text-[22px]"></i>
+                    <span id="student-notify-badge" class="absolute top-[2px] right-[2px] bg-red-500 text-white text-[9px] font-bold px-1.5 py-[2px] rounded-full border-2 border-white shadow-sm hidden"></span>
+                </button>
+
+                <!-- Hamburger Toggle Icon -->
+                <button class="mobile-toggle" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" type="button">
+                    <div class="menu-icon-wrapper">
+                        <i class="fas fa-bars icon-bars"></i>
+                        <i class="fas fa-times icon-close"></i>
+                    </div>
+                </button>
+            </div>
+            
+            <ul class="nav-menu" aria-label="Primary navigation">
+                <li><a href="index.html?public=1" class="nav-link student-public-nav-link"><i class="fas fa-home text-lg w-6"></i> Home</a></li>
+                <li><a href="index.html?public=1#about" class="nav-link student-public-nav-link"><i class="fas fa-circle-info text-lg w-6"></i> About</a></li>
+                <li><a href="index.html?public=1#teachers" class="nav-link student-public-nav-link"><i class="fas fa-chalkboard-teacher text-lg w-6"></i> Teachers</a></li>
+                <li><a href="index.html?public=1#notices" class="nav-link student-public-nav-link"><i class="fas fa-bullhorn text-lg w-6"></i> Notices</a></li>
+                <li><a href="index.html?public=1#gallery" class="nav-link student-public-nav-link"><i class="fas fa-images text-lg w-6"></i> Gallery</a></li>
+                <div class="border-t border-gray-100 my-1"></div>
+                <li id="student-nav-home"><a href="#home" class="nav-link tab-link active" data-target="home-page"><i class="fas fa-id-badge text-lg w-6"></i> My Profile</a></li>
+                <li id="student-nav-fees"><a href="#fees" class="nav-link tab-link" data-target="fees-page"><i class="fas fa-file-invoice-dollar text-lg w-6"></i> Fee Details</a></li>
+                <li id="student-nav-attendance"><a href="#attendance" class="nav-link tab-link" data-target="attendance-page"><i class="fas fa-calendar-check text-lg w-6"></i> Attendance</a></li>
+                <li id="student-nav-timetable"><a href="#timetable" class="nav-link tab-link" data-target="timetable-page"><i class="fas fa-calendar-days text-lg w-6"></i> Timetable</a></li>
+                <li id="student-nav-syllabus"><a href="#syllabus" class="nav-link tab-link" data-target="syllabus-page"><i class="fas fa-book-open text-lg w-6"></i> Syllabus Plan</a></li>
+                <li id="student-nav-results"><a href="#results" class="nav-link tab-link" data-target="results-page"><i class="fas fa-square-poll-vertical text-lg w-6"></i> <span>Results</span></a></li>
+                <li id="student-nav-activities"><a href="#activities" class="nav-link tab-link" data-target="activities-page"><i class="fas fa-award text-lg w-6"></i> Activities &amp; Badges</a></li>
+                <li id="student-nav-publichome"><a href="index.html?public=1" class="nav-link"><i class="fas fa-globe text-lg w-6"></i> Public Page</a></li>
+                <div class="border-t border-gray-100 my-1"></div>
+                <li id="student-install-menu-item" class="hidden"><button type="button" id="student-install-btn" class="nav-link w-full text-left font-bold text-blue-600 hover:bg-blue-50 cursor-pointer"><i class="fas fa-download text-lg w-6"></i> Install App</button></li>
+                <li><button id="student-logout-btn" class="login-btn-nav btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="w-full">
+        <!-- 1. COMPREHENSIVE STUDENT PROFILE VIEW -->
+        <section id="home-page" class="page-content">
+            <div class="max-w-4xl mx-auto w-full space-y-4 sm:space-y-6">
+                <!-- Profile Header / ID Badge Card -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden transition hover:shadow-lg">
+                    <!-- Top Institution Banner -->
+                    <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 px-4 py-4 sm:px-6 sm:py-6 text-white text-center relative">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-white/90 text-[10px] sm:text-xs font-bold tracking-wide uppercase mb-1.5 sm:mb-2 backdrop-blur-xs">
+                            <i class="fas fa-graduation-cap"></i> Student Profile
+                        </div>
+                        <h2 class="text-lg sm:text-2xl font-extrabold tracking-tight" id="id-school-name">Institution Name</h2>
+                        <p class="text-xs sm:text-sm text-blue-100 font-medium mt-0.5" id="id-school-sub">Excellence in Education</p>
+                    </div>
+
+                    <!-- Student Avatar & Main Identity Info -->
+                    <div class="p-4 sm:p-8 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 border-b border-slate-100 bg-gradient-to-b from-white to-slate-50/50">
+                        <!-- 1. Profile Photo (Toggled by admin 'Photo' setting) -->
+                        <div id="student-profile-photo-wrap" class="flex flex-col items-center shrink-0">
+                            <div class="relative flex items-center justify-center p-1">
+                                <!-- Circular Upload Progress Ring -->
+                                <svg id="student-photo-progress-ring" class="pointer-events-none absolute inset-0 w-full h-full -rotate-90 hidden z-10" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="56" fill="none" stroke="#dbeafe" stroke-width="5"></circle>
+                                    <circle id="student-photo-progress-circle" cx="60" cy="60" r="56" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="351.86" style="transition: stroke-dashoffset 0.2s ease, stroke 0.2s ease;"></circle>
+                                </svg>
+                                <div id="dash-avatar" class="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border-3 sm:border-4 border-white shadow-lg sm:shadow-xl ring-2 ring-blue-100 flex items-center justify-center bg-slate-100 text-slate-400 text-2xl sm:text-4xl font-black cursor-pointer hover:opacity-95 transition-all relative">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <!-- Progress Percentage Badge Overlay -->
+                                <div id="student-photo-progress-overlay" class="pointer-events-none absolute inset-1 rounded-full bg-slate-900/55 backdrop-blur-[1px] hidden items-center justify-center z-20">
+                                    <span id="student-photo-progress-text" class="text-white text-[10px] sm:text-sm font-extrabold font-mono tracking-wider px-2 py-0.5 rounded-full bg-black/40">0%</span>
+                                </div>
+                                <!-- Pencil Edit Button for Photo Only -->
+                                <button type="button" id="student-edit-top-btn" class="absolute bottom-0 right-0 z-30 bg-blue-600 hover:bg-blue-700 text-white w-7 h-7 sm:w-9 sm:h-9 rounded-full border-2 border-white shadow-md flex items-center justify-center text-xs sm:text-sm transition cursor-pointer" title="Edit Profile Photo">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </div>
+                            <input type="file" id="student-photo-file-input" accept="image/*" class="hidden">
+                        </div>
+
+                        <!-- Identity Headline Details -->
+                        <div class="flex-1 text-center sm:text-left space-y-2.5 min-w-0 w-full">
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight" id="dash-name">-</h1>
+                                <!-- Student Name Edit Button -->
+                                <button type="button" class="field-edit-btn p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" data-field="name" data-label="Student Name" data-type="text" title="Edit Student Name">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                <!-- Class Badge -->
+                                <span class="bg-blue-100/80 text-blue-800 text-xs font-bold px-3 py-1 rounded-full border border-blue-200 flex items-center gap-1.5">
+                                    <i class="fas fa-chalkboard"></i> <span id="dash-class">Class: -</span>
+                                </span>
+                                <!-- Student Status Badge -->
+                                <span class="bg-emerald-100/80 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5" id="dash-status-badge">
+                                    <i class="fas fa-check-circle"></i> <span id="dash-status">Active</span>
+                                </span>
+                                <!-- Gender Badge (with edit option) -->
+                                <span class="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200 flex items-center gap-1" id="dash-gender-badge">
+                                    <i class="fas fa-venus-mars"></i> <span id="dash-gender">-</span>
+                                    <button type="button" class="field-edit-btn text-slate-400 hover:text-blue-600 ml-1 p-0.5" data-field="gender" data-label="Gender" data-type="select" data-options="Male,Female" title="Edit Gender">
+                                        <i class="fas fa-pencil-alt text-[10px]"></i>
+                                    </button>
+                                </span>
+                            </div>
+
+                            <!-- Admission Number & UID -->
+                            <div class="text-xs text-slate-500 font-semibold flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 pt-1">
+                                <span><span class="text-slate-400 font-medium">Adm No:</span> <strong class="text-slate-700 font-mono" id="dash-adm">-</strong></span>
+                                <span><span class="text-slate-400 font-medium">UID:</span> <strong class="text-slate-700 font-mono" id="dash-uid">-</strong></span>
+                            </div>
+
+                            <!-- Academic Year placed directly below Admission Number & UID -->
+                            <div class="pt-1 flex items-center justify-center sm:justify-start">
+                                <span class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-2.5 py-1 rounded-md" id="dash-academic-year-badge">
+                                    <i class="fas fa-calendar-alt text-[11px] text-indigo-600"></i> <span id="dash-academic-year">Academic Year: -</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STUDENT DETAILS SECTION (Toggled by admin 'Details' setting - No Repeated Fields) -->
+                    <div id="student-details-section" class="p-6 sm:p-8">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                            <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                                <i class="fas fa-id-card text-blue-600"></i> Student Information
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                            <!-- Date of Birth (Editable) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group hover:border-blue-200 transition">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-cake-candles"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Date of Birth</div>
+                                        <div class="text-xs font-bold text-slate-800 break-words font-mono leading-snug" id="dash-dob">-</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="dob" data-label="Date of Birth" data-type="date" title="Edit Date of Birth">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Date of Admission (Read-only) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Date of Admission</div>
+                                        <div class="text-xs font-bold text-slate-800 break-words font-mono leading-snug" id="dash-adm-date">-</div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-400 bg-slate-200/70 px-2 py-0.5 rounded" title="Read-only"><i class="fas fa-lock text-[9px]"></i></span>
+                            </div>
+
+                            <!-- Aadhaar Number (Editable) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group hover:border-blue-200 transition">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-address-card"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Aadhaar Number</div>
+                                        <div class="text-xs font-bold text-slate-800 break-words font-mono leading-snug" id="dash-adhaar">-</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="adhaar" data-label="Aadhaar Number" data-type="text" title="Edit Aadhaar Number">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Father's Name (Editable) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group hover:border-blue-200 transition">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Father's Name</div>
+                                        <div class="text-xs font-bold text-slate-800 break-words leading-snug" id="dash-father">-</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="father" data-label="Father's Name" data-type="text" title="Edit Father's Name">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Father's Phone Number (Editable) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group hover:border-blue-200 transition">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Father's Phone Number</div>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <a href="#" id="dash-mobile-link" class="text-xs font-bold text-blue-700 hover:underline font-mono break-all leading-snug"><span id="dash-mobile">-</span></a>
+                                            <button type="button" class="copy-pay-detail-btn inline-flex items-center justify-center p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition" data-copy-value="" id="dash-mobile-copy" title="Copy Number"><i class="fas fa-copy text-xs"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="mobile" data-label="Father's Phone Number" data-type="tel" title="Edit Father's Phone">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Mother's Name (Editable) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group hover:border-blue-200 transition">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-female"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Mother's Name</div>
+                                        <div class="text-xs font-bold text-slate-800 break-words leading-snug" id="dash-mother">-</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="mother" data-label="Mother's Name" data-type="text" title="Edit Mother's Name">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Mother's Phone Number (Editable) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 group hover:border-blue-200 transition">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-pink-100 text-pink-700 flex items-center justify-center shrink-0 text-base">
+                                        <i class="fas fa-phone-volume"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Mother's Phone Number</div>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <a href="#" id="dash-mother-mobile-link" class="text-xs font-bold text-pink-700 hover:underline font-mono break-all leading-snug"><span id="dash-mother-mobile">-</span></a>
+                                            <button type="button" class="copy-pay-detail-btn inline-flex items-center justify-center p-1 rounded text-slate-400 hover:text-pink-600 hover:bg-pink-50 transition" data-copy-value="" id="dash-mother-mobile-copy" title="Copy Number"><i class="fas fa-copy text-xs"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="motherMobile" data-label="Mother's Phone Number" data-type="tel" title="Edit Mother's Phone">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Permanent Address (Editable, Full Width) -->
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-start justify-between gap-3 sm:col-span-2 lg:col-span-3 group hover:border-blue-200 transition">
+                                <div class="flex items-start gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center shrink-0 text-base mt-0.5">
+                                        <i class="fas fa-map-location-dot"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Permanent Address</div>
+                                        <div class="text-xs font-medium text-slate-800 mt-0.5 leading-relaxed break-words" id="dash-addr">-</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="field-edit-btn p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 shadow-xs transition" data-field="address" data-label="Permanent Address" data-type="textarea" title="Edit Address">
+                                    <i class="fas fa-pencil-alt text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- AT THE VERY BOTTOM: CONCESSION & SIBLING GROUP CONFIGURATION -->
+                        <div class="mt-6 pt-5 border-t border-slate-200 hidden" id="dash-concession-group-section">
+                            <div class="flex items-center justify-between mb-3.5">
+                                <h4 class="text-sm font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                                    <i class="fas fa-users-rectangle text-indigo-600"></i> Fee Concession & Sibling Group
+                                </h4>
+                                <span id="dash-group-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">Checking...</span>
+                            </div>
+
+                            <div id="dash-concession-group-details" class="space-y-3">
+                                <!-- Dynamically populated by student-page.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="student-profile-payment-details" class="mt-4 hidden"></div>
+            </div>
+        </section>
+
+        <!-- 2. FEES TAB -->
+        <section id="fees-page" class="page-content hidden">
+            <div class="content-card">
+                <h2 class="text-xl font-bold mb-1 text-gray-800"><i class="fas fa-receipt text-accent mr-2"></i> Fee Details</h2>
+                <p class="text-xs text-gray-500 font-semibold mb-4">Click on a fee block to view full details.</p>
+                <div class="mb-4 flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 gap-3">
+                    <div>
+                        <div id="fee-class-label" class="text-base sm:text-lg font-bold text-blue-800">Class: --</div>
+                    </div>
+                    <select id="fee-year-select" class="min-w-[150px] p-2 rounded-lg border border-blue-200 text-sm font-semibold text-blue-800 bg-white"></select>
+                </div>
+                
+                <!-- Categorized Fee Grids Injected Here -->
+                <div id="fee-sections-container"></div>
+                
+                <!-- Summary Totals Block in One Line -->
+                <div id="fee-summary"></div>
+                <div id="fee-status-insights" class="mt-4"></div>
+            </div>
+        </section>
+
+        <!-- 4. RESULTS TAB -->
+        <section id="results-page" class="page-content hidden">
+            <div class="content-card">
+                <h2 class="text-xl font-bold mb-1 text-gray-800"><i class="fas fa-poll text-accent mr-2"></i> Exam Results</h2>
+                <div class="mb-5 flex flex-wrap items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-3 sm:p-4 gap-3 shadow-xs">
+                    <div>
+                        <div id="results-year-label" class="text-sm font-extrabold text-blue-900">Academic Year</div>
+                        <div id="results-class-label" class="text-xs font-semibold text-blue-600">Class: --</div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="flex items-center gap-1.5 bg-white border border-blue-200 rounded-xl px-2.5 py-1.5 shadow-xs">
+                            <i class="fas fa-calendar-alt text-blue-500 text-xs"></i>
+                            <select id="results-year-select" class="text-xs font-bold text-blue-900 bg-transparent outline-none cursor-pointer"></select>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-white border border-blue-200 rounded-xl px-2.5 py-1.5 shadow-xs">
+                            <i class="fas fa-file-signature text-blue-500 text-xs"></i>
+                            <select id="results-exam-select" class="text-xs font-bold text-blue-900 bg-transparent outline-none cursor-pointer"></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="results-container"></div>
+            </div>
+        </section>
+
+        <!-- 3. ATTENDANCE REGISTER TAB -->
+        <section id="attendance-page" class="page-content hidden">
+            <div class="content-card p-3.5 sm:p-6 space-y-3.5 sm:space-y-5">
+                <!-- Title & Academic Year / Month Bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-slate-100 pb-2.5 sm:pb-3">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-calendar-check text-teal-600"></i> Attendance Record
+                        </h2>
+                        <p class="text-xs text-slate-500 font-semibold mt-0.5">Personalized academic year attendance history &amp; calendar</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                            <i class="fas fa-calendar-alt text-teal-600 text-xs"></i>
+                            <select id="stu-att-year-select" class="text-xs font-bold text-slate-800 bg-transparent outline-none cursor-pointer"></select>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                            <i class="fas fa-calendar-day text-teal-600 text-xs"></i>
+                            <select id="stu-att-month-select" class="text-xs font-bold text-slate-800 bg-transparent outline-none cursor-pointer"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High-level Metric Cards Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                    <!-- Overall Percentage -->
+                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl border bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-200 flex flex-col justify-between">
+                        <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-teal-700">Attendance Rate</div>
+                        <div class="text-xl sm:text-3xl font-black text-teal-950 mt-0.5 sm:mt-1 font-mono" id="stu-att-rate">--%</div>
+                        <div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full inline-block self-start" id="stu-att-rate-badge">Calculating...</div>
+                    </div>
+
+                    <!-- Total Working Days -->
+                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 bg-white flex flex-col justify-between">
+                        <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400">Total Working Days</div>
+                        <div class="text-xl sm:text-3xl font-black text-slate-900 mt-0.5 sm:mt-1 font-mono" id="stu-att-total-days">0</div>
+                        <div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] font-bold text-slate-500">Recorded sessions</div>
+                    </div>
+
+                    <!-- Present Days -->
+                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-emerald-200 bg-emerald-50/50 flex flex-col justify-between">
+                        <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-emerald-700">Days Present</div>
+                        <div class="text-xl sm:text-3xl font-black text-emerald-900 mt-0.5 sm:mt-1 font-mono" id="stu-att-present-days">0</div>
+                        <div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] font-bold text-emerald-700">In-class attendance</div>
+                    </div>
+
+                    <!-- Absent & Leave Days -->
+                    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-rose-200 bg-rose-50/50 flex flex-col justify-between">
+                        <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-rose-700">Days Absent</div>
+                        <div class="text-xl sm:text-3xl font-black text-rose-900 mt-0.5 sm:mt-1 font-mono">
+                            <span id="stu-att-total-absent-days">0</span>
+                        </div>
+                        <div class="mt-1.5 sm:mt-2 text-[9px] sm:text-[10px] font-bold text-rose-600" id="stu-att-absent-breakdown">Total missed / excused</div>
+                    </div>
+                </div>
+
+                <!-- Month Pills Selector -->
+                <div>
+                    <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-1.5 sm:mb-2">Filter by Month</div>
+                    <div id="stu-att-month-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
+                        <!-- Dynamic Month Pills Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Monthly Attendance Daily Log & Calendar Container -->
+                <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+                    <div class="p-3 sm:p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-list text-teal-600 text-xs"></i>
+                            <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800" id="stu-att-month-title">Monthly Session Register</h3>
+                        </div>
+                        <div class="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-bold text-slate-600">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500"></span> Present</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500"></span> Absent</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500"></span> Leave</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-slate-300"></span> Holiday</span>
+                        </div>
+                    </div>
+                    <div id="stu-att-daily-grid" class="p-2.5 sm:p-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-1.5 sm:gap-2.5">
+                        <!-- Daily Status Pills Injected by JS -->
+                    </div>
+                    <div id="stu-att-empty-state" class="p-8 text-center text-slate-400 font-bold hidden">
+                        <i class="fas fa-calendar-xmark text-2xl mb-2 text-slate-300"></i>
+                        <p class="text-xs">No attendance marked for the selected month.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. TIMETABLE PLAN TAB -->
+        <section id="timetable-page" class="page-content hidden">
+            <div class="content-card p-3.5 sm:p-6 space-y-3.5 sm:space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-slate-100 pb-2.5 sm:pb-3">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-calendar-days text-indigo-600"></i> Class Timetable
+                        </h2>
+                        <p class="text-xs text-slate-500 font-semibold mt-0.5">Daily period routine, timings &amp; subject schedules</p>
+                    </div>
+                </div>
+
+                <div id="stu-tt-subview" class="space-y-3 sm:space-y-4">
+                    <!-- Day of Week Selector Pills -->
+                    <div>
+                        <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-1.5 sm:mb-2">Select Day of Week</div>
+                        <div id="stu-tt-day-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
+                            <!-- Injected by JS (Monday through Sunday) -->
+                        </div>
+                    </div>
+
+                    <!-- Daily Routine Periods Grid -->
+                    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+                        <div class="p-3 sm:p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <span id="stu-tt-selected-day-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">Monday</span>
+                                <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800" id="stu-tt-day-title">Daily Period Schedule</h3>
+                            </div>
+                            <span class="text-xs font-bold text-slate-500" id="stu-tt-class-badge">Class --</span>
+                        </div>
+
+                        <div id="stu-tt-periods-container" class="p-2.5 sm:p-4 space-y-2.5 sm:space-y-3">
+                            <!-- Period Schedule Cards Injected by JS -->
+                        </div>
+                        <div id="stu-tt-empty-state" class="p-8 text-center text-slate-400 font-bold hidden">
+                            <i class="fas fa-mug-hot text-2xl mb-2 text-slate-300"></i>
+                            <p class="text-xs">No periods scheduled for this day (Holiday / Rest Day).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. SYLLABUS PLAN TAB -->
+        <section id="syllabus-page" class="page-content hidden">
+            <div class="content-card p-3.5 sm:p-6 space-y-3.5 sm:space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-slate-100 pb-2.5 sm:pb-3">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-book-open text-blue-600"></i> Syllabus Plan &amp; Curriculum
+                        </h2>
+                        <p class="text-xs text-slate-500 font-semibold mt-0.5">Monthly course plan, textbook units &amp; syllabus completion targets</p>
+                    </div>
+                </div>
+
+                <div id="stu-syllabus-subview" class="space-y-3 sm:space-y-4">
+                    <!-- Month Selector Pills -->
+                    <div>
+                        <div class="text-xs font-black uppercase tracking-wider text-slate-500 mb-1.5 sm:mb-2">Academic Month</div>
+                        <div id="stu-syllabus-month-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Syllabus Targets List -->
+                    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+                        <div class="p-3 sm:p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-book-bookmark text-blue-600 text-xs"></i>
+                                <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800" id="stu-syllabus-month-heading">Monthly Course Plan</h3>
+                            </div>
+                            <span class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full" id="stu-syllabus-portion-count">0 Subjects Planned</span>
+                        </div>
+
+                        <div id="stu-syllabus-cards-container" class="p-2.5 sm:p-4 grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3.5">
+                            <!-- Planned Subject Cards with Progress Bars Injected by JS -->
+                        </div>
+                        <div id="stu-syllabus-empty-state" class="p-8 text-center text-slate-400 font-bold hidden">
+                            <i class="fas fa-circle-check text-2xl mb-2 text-slate-300"></i>
+                            <p class="text-xs">No syllabus portions configured for this month.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. ACTIVITIES & REWARDS TAB -->
+        <section id="activities-page" class="page-content hidden">
+            <div class="content-card p-2.5 sm:p-5 space-y-2.5 sm:space-y-4">
+                <!-- Self-Logging Permission Notice Banner -->
+                <div id="stu-act-logging-status-banner" class="p-2.5 sm:p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs font-bold flex items-center justify-between gap-2">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-lock text-slate-400"></i>
+                        <span>Self-logging is currently locked for your class. Records are updated by your class teacher.</span>
+                    </span>
+                </div>
+
+                <!-- Header Banner -->
+                <div class="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 rounded-xl sm:rounded-2xl p-3 sm:p-5 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 text-white backdrop-blur-xs">
+                            <i class="fas fa-award"></i> Student Achievements
+                        </div>
+                        <h2 class="text-base sm:text-2xl font-black tracking-tight" id="stu-act-hero-name">Activities &amp; Rewards</h2>
+                        <p class="text-[11px] sm:text-xs text-amber-100 font-medium">Co-curricular points, badges &amp; character cultivation</p>
+                    </div>
+
+                    <!-- 3 Scores in a Single Row (Daily, Monthly, Total) -->
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5 w-full md:w-auto">
+                        <!-- 1. Daily Score -->
+                        <div class="bg-white/15 border border-white/25 backdrop-blur-md rounded-xl px-2 py-1.5 sm:px-3.5 sm:py-2 text-center min-w-[70px] sm:min-w-[95px]">
+                            <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/80">Daily</div>
+                            <div class="text-base sm:text-2xl font-black text-white font-mono mt-0.5" id="stu-act-daily-points">0</div>
+                            <div class="text-[8px] sm:text-[9px] font-semibold text-amber-100/90 mt-0.5">Today</div>
+                        </div>
+
+                        <!-- 2. Monthly Score -->
+                        <div class="bg-white/15 border border-white/25 backdrop-blur-md rounded-xl px-2 py-1.5 sm:px-3.5 sm:py-2 text-center min-w-[70px] sm:min-w-[95px]">
+                            <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/80">Monthly</div>
+                            <div class="text-base sm:text-2xl font-black text-white font-mono mt-0.5" id="stu-act-monthly-points">0</div>
+                            <div class="text-[8px] sm:text-[9px] font-semibold text-amber-100/90 mt-0.5">This Month</div>
+                        </div>
+
+                        <!-- 3. Total / Yearly Score -->
+                        <div class="bg-white/20 border-2 border-white/40 backdrop-blur-md rounded-xl px-2 py-1.5 sm:px-3.5 sm:py-2 text-center min-w-[75px] sm:min-w-[105px] shadow-xs">
+                            <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-amber-200" id="stu-act-points-scope-label">Total</div>
+                            <div class="text-base sm:text-2xl font-black text-white font-mono mt-0.5" id="stu-act-total-points">0</div>
+                            <div class="text-[8px] sm:text-[9px] font-extrabold text-amber-200 mt-0.5" id="stu-act-tier-badge">Star Student</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badges Showcase -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5 sm:mb-2.5 border-b border-slate-100 pb-1.5">
+                        <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5 sm:gap-2">
+                            <i class="fas fa-medal text-amber-500"></i> Earned Badges &amp; Recognitions
+                        </h3>
+                        <span id="stu-act-badges-count" class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">0 Badges</span>
+                    </div>
+
+                    <div id="stu-act-badges-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5 sm:gap-3">
+                        <!-- Badges Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Date Navigator Bar -->
+                <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-2 sm:p-2.5 shadow-2xs flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <button type="button" id="btn-act-prev-day" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Previous Day">
+                            <i class="fas fa-chevron-left"></i> <span class="hidden sm:inline">Prev</span>
+                        </button>
+                        <div class="flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-xs font-bold">
+                            <i class="fas fa-calendar-day text-amber-600"></i>
+                            <input type="date" id="stu-act-date-picker" class="bg-transparent border-none font-black text-slate-800 outline-none cursor-pointer text-xs">
+                        </div>
+                        <button type="button" id="btn-act-next-day" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Next Day">
+                            <span class="hidden sm:inline">Next</span> <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" id="btn-act-today" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs transition shadow-2xs cursor-pointer">
+                            Today
+                        </button>
+                        <span class="text-xs text-slate-500 font-bold" id="stu-act-streak-date">Today</span>
+                    </div>
+                </div>
+
+                <!-- Daily Habits & Streak Checklist (5 Fard Prayers) -->
+                <div id="stu-act-fard-section" class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+                    <div class="p-2.5 sm:p-3.5 bg-slate-50 border-b border-slate-200">
+                        <div class="flex items-center justify-between flex-wrap gap-1.5">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-hands-praying text-amber-600 text-xs"></i>
+                                <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800">5 Daily Fard Prayers</h3>
+                            </div>
+                            <span class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full" id="stu-act-fard-status-pill">Routine Prayers</span>
+                        </div>
+                        <div id="stu-act-fard-rubric-subtext" class="mt-1 text-[10px] sm:text-[11px] text-slate-500 font-semibold flex items-center flex-wrap gap-x-3 gap-y-0.5">
+                            <span class="text-emerald-700 font-bold"><strong class="font-black bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded border border-emerald-300">J</strong> Jama'ah (+15 pts)</span>
+                            <span class="text-blue-700 font-bold"><strong class="font-black bg-blue-100 text-blue-800 px-1 py-0.2 rounded border border-blue-300">A</strong> Ada'a (+10 pts)</span>
+                            <span class="text-rose-700 font-bold"><strong class="font-black bg-rose-100 text-rose-800 px-1 py-0.2 rounded border border-rose-300">Q</strong> Qaza (0 pts)</span>
+                        </div>
+                    </div>
+                    <div id="stu-act-prayers-container" class="p-2 sm:p-3.5">
+                        <!-- Prayer Status Cards Injected by JS (Subh, Zuhr, Asr, Maghrib, Isha) -->
+                    </div>
+                </div>
+
+                <!-- Dedicated Extra Sunnah Prayers Section -->
+                <div id="stu-act-sunnah-section" class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+                    <div class="p-2.5 sm:p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-1.5">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-sun text-amber-500 text-xs"></i>
+                            <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800">Extra Sunnah Prayers</h3>
+                        </div>
+                        <span class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full" id="stu-act-sunnah-count">0 Active</span>
+                    </div>
+                    <div id="stu-act-sunnah-container" class="p-2 sm:p-3.5 grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-2.5">
+                        <!-- Dynamic Sunnah Cards Injected by JS -->
+                    </div>
+                    <div id="stu-act-sunnah-empty" class="p-4 text-center text-slate-400 font-bold text-xs hidden">
+                        <i class="fas fa-hands-praying text-2xl mb-1 text-slate-300"></i>
+                        <p>No extra Sunnah prayers active for this date.</p>
+                    </div>
+                </div>
+
+                <!-- Assigned Activities & Daily Tasks Checklist -->
+                <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+                    <div class="p-2.5 sm:p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-1.5">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-tasks text-amber-600 text-xs"></i>
+                            <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800">Assigned Tasks &amp; Activities</h3>
+                        </div>
+                        <span class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full" id="stu-act-tasks-count">Daily Targets</span>
+                    </div>
+
+                    <!-- Cadence Filter Pills -->
+                    <div class="p-2 sm:p-2.5 bg-white border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+                        <button type="button" class="btn-stu-task-cadence px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl text-xs font-extrabold transition bg-amber-500 text-white shadow-2xs cursor-pointer" data-cadence="all">
+                            All Tasks
+                        </button>
+                        <button type="button" class="btn-stu-task-cadence px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer" data-cadence="daily">
+                            Daily
+                        </button>
+                        <button type="button" class="btn-stu-task-cadence px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer" data-cadence="weekly">
+                            Weekly
+                        </button>
+                        <button type="button" class="btn-stu-task-cadence px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer" data-cadence="monthly">
+                            Monthly
+                        </button>
+                    </div>
+
+                    <div id="stu-act-tasks-container" class="p-2 sm:p-3.5 grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+                        <!-- Task items injected by JS -->
+                    </div>
+                    <div id="stu-act-tasks-empty" class="p-5 text-center text-slate-400 font-bold text-xs hidden">
+                        <i class="fas fa-clipboard-check text-2xl mb-1 text-slate-300"></i>
+                        <p>No activity tasks assigned for today.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav id="student-bottom-nav" class="hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-40">
+        <div id="student-bottom-nav-container" class="grid grid-cols-4 sm:grid-cols-5 text-xs font-bold text-gray-600">
+            <!-- Dynamically populated by student-page.js -->
+        </div>
+    </nav>
+
+    <!-- Mobile More Tabs Bottom Sheet -->
+    <div id="student-more-sheet" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-200">
+        <div class="bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl border border-slate-200 animate-[slideUp_.2s_ease-out] space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+                    <i class="fas fa-grid text-blue-600"></i> More Portal Features
+                </h3>
+                <button type="button" id="btn-close-more-sheet" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition border-none cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+            <div id="student-more-sheet-items" class="grid grid-cols-2 gap-2.5">
+                <!-- Additional Tabs Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="student-account-switcher" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-md p-5 sm:p-6 animate-[fadeIn_.18s_ease-out] space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm">
+                        <i class="fas fa-users-viewfinder"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-base text-slate-800">Student Accounts</h3>
+                        <p class="text-[11px] text-slate-400 font-bold">Switch or manage saved student profiles</p>
+                    </div>
+                </div>
+                <button type="button" id="close-account-switcher" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition border-none cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+            <div id="student-account-list" class="space-y-2.5 max-h-72 overflow-y-auto pr-1 custom-scrollbar"></div>
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <button type="button" id="account-switcher-add-btn" class="flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-extrabold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                    <i class="fas fa-plus"></i> Add Account
+                </button>
+                <button type="button" id="account-switcher-logout-btn" class="py-2.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                    <i class="fas fa-sign-out-alt"></i> Logout All Accounts
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Account Switch Animated Notification Pill -->
+    <div id="student-quick-switch-pill" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-4">
+        <div class="px-4 py-2.5 bg-slate-900/90 text-white text-xs font-black rounded-full shadow-2xl flex items-center gap-2 border border-slate-700/60 backdrop-blur-md">
+            <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px]">
+                <i class="fas fa-check"></i>
+            </div>
+            <span id="student-quick-switch-text">Switched Account</span>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION SLIDE PANEL (Glassmorphism Pattern) -->
+    <div id="student-notify-backdrop" class="fixed inset-0 z-[899] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="student-notify-panel" class="student-notify-dropdown">
+        <div class="student-notify-head">
+            <h3 class="flex items-center gap-2">
+                <i class="fas fa-bell text-blue-600"></i>
+                <span>Notifications</span>
+                <span id="student-notify-panel-count" class="hidden bg-red-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full leading-none">0</span>
+            </h3>
+            <div class="student-notify-actions">
+                <button id="student-notify-mark-all" type="button">Mark all read</button>
+                <button id="student-notify-close" type="button" aria-label="Close notifications"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <!-- Phone Notification Toggle Banner (Always Visible for Enable / Disable) -->
+        <div id="student-notify-perm-banner" class="px-3.5 py-2.5 bg-blue-50/90 border-b border-blue-100 flex items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2 min-w-0">
+                <i id="student-notify-perm-icon" class="fas fa-mobile-screen-button text-blue-600 text-sm shrink-0"></i>
+                <div class="min-w-0">
+                    <div id="student-notify-perm-text" class="text-[11px] font-bold text-slate-800 leading-tight">Get instant notices & alerts in your phone notification center</div>
+                    <div id="student-notify-perm-subtext" class="text-[10px] font-medium text-slate-500 leading-tight mt-0.5">Tap Enable to receive phone notifications</div>
+                </div>
+            </div>
+            <button id="student-enable-phone-notify-btn" type="button" class="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer">
+                Enable
+            </button>
+        </div>
+        <div id="student-notify-list" class="student-notify-list custom-scrollbar">
+            <!-- Notifications injected dynamically -->
+        </div>
+    </div>
+
+    <!-- Default Startup Phone Notification Confirmation Modal -->
+    <div id="student-notify-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-[2px] hidden items-center justify-center z-[10005] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-sm p-5 text-center animate-[fadeIn_.2s_ease-out]">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-3 text-xl shadow-xs">
+                <i class="fas fa-bell"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-slate-800">Enable Phone Notifications?</h3>
+            <p class="text-xs font-medium text-slate-600 mt-1.5 leading-relaxed">
+                Get instant institutional notices, exam results, and daily fee due reminders directly in your phone's notification center. You can disable this anytime from the notification panel.
+            </p>
+            <div class="mt-4 flex items-center gap-2.5">
+                <button id="student-notify-confirm-later" type="button" class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold text-xs transition cursor-pointer">
+                    Later
+                </button>
+                <button id="student-notify-confirm-ok" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition cursor-pointer">
+                    OK, Enable
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="student-detail-modal" class="fixed inset-0 bg-slate-900/55 hidden items-center justify-center z-[10000] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg">
+            <div class="flex items-center justify-between p-4 border-b border-slate-100">
+                <h3 id="student-detail-modal-title" class="text-base font-extrabold text-slate-800">Details</h3>
+                <button id="student-detail-modal-close" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="student-detail-modal-body" class="p-4 text-sm text-slate-700 max-h-[65vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="follow-title">FOLLOW US</div>
+        <div class="socials">
+            <a href="#" id="link-youtube" target="_blank" class="hidden"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#" id="link-telegram" target="_blank" class="hidden"><i class="fa-brands fa-telegram-plane"></i></a>
+            <a href="#" id="link-instagram" target="_blank" class="hidden"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" id="link-whatsapp" target="_blank" class="hidden"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" id="link-facebook" target="_blank" class="hidden"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+        <div class="corporate">
+           <a href="#" id="footer-email-link"><i class="fas fa-envelope"></i> <span id="footer-email">Email</span></a>
+           <a href="#" id="footer-phone-link"><i class="fas fa-phone"></i> <span id="footer-phone">Phone</span></a>
+        </div>
+        <div class="divider"></div>
+        <div class="copy">© <span id="footer-inst-name">Institution Name</span>. All Rights Reserved.</div>
+        <div class="powered">Developed by <a href="https://www.instagram.com/muhammed_sanjide_p" target="_blank">HADI MAHIRI FAIZY</a></div>
+        <div class="app-version-meta">
+            <div id="footer-version">Version: --</div>
+            <div id="footer-updated">Last Updated: --</div>
+        </div>
+    </footer>
+
+    <!-- Student Photo Preview / Lightbox Modal -->
+    <div id="student-photo-viewer-modal" class="fixed inset-0 bg-black/90 backdrop-blur-xs hidden items-center justify-center z-[10002] p-4">
+        <div class="relative max-w-sm sm:max-w-md w-full bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex flex-col items-center p-4">
+            <button type="button" id="student-photo-viewer-close-btn" class="absolute top-3 right-3 text-white/80 hover:text-white bg-black/40 hover:bg-black/70 rounded-full w-8 h-8 flex items-center justify-center text-sm transition">
+                <i class="fas fa-times"></i>
+            </button>
+            <h4 class="text-white text-sm font-bold mb-3 flex items-center gap-2"><i class="fas fa-image text-blue-400"></i> Profile Photo</h4>
+            <div class="w-full aspect-square max-h-[70vh] rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                <img id="student-photo-viewer-img" src="" class="w-full h-full object-contain" alt="Full Profile Photo">
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Camera Modal -->
+    <div id="student-camera-modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[10003] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2"><i class="fas fa-camera text-blue-600"></i> Take Photo (1:1 Square)</h3>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="student-camera-flip-btn" class="p-1.5 px-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition" title="Switch Camera (Front / Back)">
+                        <i class="fas fa-camera-rotate"></i> Flip
+                    </button>
+                    <button type="button" id="student-camera-close-btn" class="text-gray-500 hover:text-gray-700 text-xl font-bold w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
+                </div>
+            </div>
+            <div class="relative w-full max-w-[280px] aspect-square mx-auto bg-black rounded-xl overflow-hidden flex items-center justify-center border-2 border-blue-500/40 shadow-inner">
+                <video id="student-camera-video" class="w-full h-full object-cover" playsinline muted></video>
+                <div class="pointer-events-none absolute inset-0 border-2 border-white/30 rounded-xl"></div>
+            </div>
+            <p class="text-[11px] text-center text-slate-500 font-medium">Position face inside the square frame</p>
+            <div class="flex justify-end gap-2 border-t pt-3">
+                <button type="button" id="student-camera-cancel-btn" class="px-4 py-2 border rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50">Cancel</button>
+                <button type="button" id="student-camera-capture-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5">
+                    <i class="fas fa-camera"></i> Capture Photo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Interactive Crop Modal -->
+    <div id="student-crop-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-[10004] p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-4 sm:p-5 space-y-3.5 my-auto">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <div>
+                    <h3 class="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fas fa-crop-simple text-blue-600"></i>
+                        <span>Crop & Position Photo</span>
+                    </h3>
+                    <p class="text-[11px] text-gray-500 font-medium">Drag box or corners to select avatar area</p>
+                </div>
+                <button type="button" id="student-crop-close-btn" class="w-8 h-8 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 flex items-center justify-center text-xl font-bold transition">&times;</button>
+            </div>
+
+            <!-- Workspace Viewport with Canvas -->
+            <div class="cropper-workspace">
+                <canvas id="student-crop-canvas" class="cropper-canvas"></canvas>
+            </div>
+
+            <!-- Cropper Quick Action Tools -->
+            <div class="flex items-center justify-between gap-1.5 flex-wrap pt-0.5">
+                <div class="flex items-center gap-1.5">
+                    <button type="button" id="student-crop-rotate-btn" class="cropper-tool-btn" title="Rotate 90 degrees">
+                        <i class="fas fa-rotate-right text-blue-600"></i>
+                        <span>Rotate</span>
+                    </button>
+                    <button type="button" id="student-crop-zoomin-btn" class="cropper-tool-btn" title="Zoom In Crop Box">
+                        <i class="fas fa-magnifying-glass-plus text-emerald-600"></i>
+                        <span>Zoom +</span>
+                    </button>
+                    <button type="button" id="student-crop-zoomout-btn" class="cropper-tool-btn" title="Zoom Out Crop Box">
+                        <i class="fas fa-magnifying-glass-minus text-amber-600"></i>
+                        <span>Zoom -</span>
+                    </button>
+                </div>
+                <button type="button" id="student-crop-reset-btn" class="cropper-tool-btn text-gray-600 hover:text-gray-900" title="Reset Frame">
+                    <i class="fas fa-arrows-rotate text-gray-500"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex justify-end items-center gap-2 border-t pt-3">
+                <button type="button" id="student-crop-cancel-btn" class="px-4 py-2 border border-gray-300 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition active:scale-95">Cancel</button>
+                <button type="button" id="student-crop-save-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                    <i class="fas fa-check"></i>
+                    <span>Save Square Photo</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Photo Edit Modal (Photo Only) -->
+    <div id="student-edit-top-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[10001] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
+                    <i class="fas fa-camera text-blue-600"></i> Update Profile Photo
+                </h3>
+                <button type="button" id="student-edit-top-close-btn" class="text-gray-400 hover:text-gray-700 text-xl font-bold w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition">&times;</button>
+            </div>
+            <div class="space-y-4 px-1 text-center">
+                <!-- Square Photo Preview -->
+                <div class="flex flex-col items-center justify-center">
+                    <div class="relative w-28 h-28 rounded-2xl overflow-hidden border-4 border-white shadow-xl ring-2 ring-blue-100 bg-slate-100 flex items-center justify-center">
+                        <img id="top-edit-photo-preview" src="" class="w-full h-full object-cover hidden" alt="Photo Preview">
+                        <i id="top-edit-photo-placeholder" class="fas fa-user text-4xl text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- Photo Action Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
+                    <button type="button" id="top-edit-camera-btn" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                        <i class="fas fa-camera"></i> Camera
+                    </button>
+                    <button type="button" id="top-edit-upload-btn" class="px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                        <i class="fas fa-upload"></i> Upload Photo
+                    </button>
+                    <button type="button" id="top-edit-remove-btn" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 hidden shadow-xs">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+                <input type="hidden" id="top-edit-photo-val" value="">
+                <p class="text-[11px] text-slate-400 font-medium">Capture directly with camera or upload a clear portrait photo.</p>
+            </div>
+            <div class="flex justify-end gap-2.5 border-t pt-3">
+                <button type="button" id="student-edit-top-cancel-btn" class="px-4 py-2 border rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 transition">Cancel</button>
+                <button type="button" id="student-edit-top-save-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-md transition">Save Photo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Edit Modal for Individual Fields -->
+    <div id="student-quick-edit-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[10001] p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2" id="quick-edit-title">
+                    <i class="fas fa-pencil-alt text-blue-600"></i> Edit Field
+                </h3>
+                <button type="button" id="student-quick-edit-close-btn" class="text-gray-400 hover:text-gray-700 text-xl font-bold w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100 transition">&times;</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-gray-700 block mb-1" id="quick-edit-label">Field Value</label>
+                    <div id="quick-edit-input-container">
+                        <!-- Dynamically injected input based on field type -->
+                    </div>
+                    <div class="flex items-center justify-between mt-1 text-[11px]">
+                        <span id="quick-edit-helper" class="text-slate-400 font-medium"></span>
+                        <span id="quick-edit-char-counter" class="text-slate-400 font-mono font-bold"></span>
+                    </div>
+                    <div id="quick-edit-error-msg" class="hidden text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-2 mt-1"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 border-t pt-3">
+                <button type="button" id="student-quick-edit-cancel-btn" class="px-4 py-2 border rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 transition">Cancel</button>
+                <button type="button" id="student-quick-edit-save-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-md transition">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Edit Details Modal (Full Profile fallback) -->
+    <div id="student-edit-details-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[10001] p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-gray-800 text-sm">Edit Profile Details</h3>
+                <button type="button" id="student-edit-details-close-btn" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-3 max-h-[60vh] overflow-y-auto px-1">
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Student Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="st-edit-name" maxlength="60" class="w-full p-2 border rounded-lg font-semibold uppercase text-sm" placeholder="Student Name (Max 60 chars)">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Gender</label>
+                    <select id="st-edit-gender" class="w-full p-2 border rounded-lg text-sm bg-white">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Date of Birth</label>
+                    <input type="date" id="st-edit-dob" class="w-full p-2 border rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Aadhaar Number</label>
+                    <input type="text" id="st-edit-adhaar" maxlength="12" inputmode="numeric" class="w-full p-2 border rounded-lg text-sm font-mono" placeholder="12-digit Aadhaar Number">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Father's Name</label>
+                    <input type="text" id="st-edit-father" maxlength="60" class="w-full p-2 border rounded-lg uppercase text-sm" placeholder="Father's Name (Max 60 chars)">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Mother's Name</label>
+                    <input type="text" id="st-edit-mother" maxlength="60" class="w-full p-2 border rounded-lg uppercase text-sm" placeholder="Mother's Name (Max 60 chars)">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Father's Phone Number</label>
+                    <input type="tel" id="st-edit-father-phone" maxlength="13" inputmode="tel" class="w-full p-2 border rounded-lg text-sm font-mono" placeholder="10 digits or +91XXXXXXXXXX">
+                    <p class="text-[10px] text-slate-400 mt-0.5">10 digits, or up to 13 characters with country code (e.g. +91XXXXXXXXXX)</p>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">Mother's Phone Number</label>
+                    <input type="tel" id="st-edit-mother-phone" maxlength="13" inputmode="tel" class="w-full p-2 border rounded-lg text-sm font-mono" placeholder="10 digits or +91XXXXXXXXXX">
+                    <p class="text-[10px] text-slate-400 mt-0.5">10 digits, or up to 13 characters with country code (e.g. +91XXXXXXXXXX)</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-xs font-bold text-gray-600">Permanent Address</label>
+                        <span id="st-edit-address-counter" class="text-[10px] text-slate-400 font-mono">0 / 250</span>
+                    </div>
+                    <textarea id="st-edit-address" rows="2" maxlength="250" class="w-full p-2 border rounded-lg text-sm" placeholder="Permanent Address (Max 250 chars)"></textarea>
+                </div>
+                <div id="st-edit-error-msg" class="hidden text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-2"></div>
+            </div>
+            <div class="flex justify-end gap-2 border-t pt-3">
+                <button type="button" id="student-edit-details-cancel-btn" class="px-4 py-2 border rounded text-xs font-bold text-gray-600">Cancel</button>
+                <button type="button" id="student-edit-details-save-btn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow-md">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/pages/student-page.js"></script>
+</body>
+</html>

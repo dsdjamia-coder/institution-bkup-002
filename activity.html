@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en" data-session-guard="activity">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' https: data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src https://*.firebaseapp.com;">
+  <title>Activity &amp; Rewards - Institutional Management</title>
+
+  <!-- Session Guards -->
+  <script src="scripts/shared/session-guard.js"></script>
+  <script src="scripts/shared/page-guards.js"></script>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#d97706">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+
+  <!-- CDNs -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --bg-light: #f8fafc;
+      --header-height: 64px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-light); color: #1e293b; overflow-x: hidden; }
+
+    .attendance-sticky-header {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e2e8f0;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #side-drawer {
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .drawer-heading {
+      font-size: 10px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 12px 16px 4px 16px;
+    }
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      border-radius: 12px;
+      margin: 2px 8px;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .drawer-link:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .drawer-link.active {
+      background: #d97706 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    }
+    .drawer-link.active i {
+      color: #ffffff !important;
+    }
+
+    /* 2D Frozen / Sticky Table Styles */
+    .sticky-table-container {
+      position: relative;
+      overflow: auto;
+      max-height: 68vh;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      background: #ffffff;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sticky-table {
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      width: 100%;
+      font-size: 12px;
+    }
+    .sticky-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #f1f5f9;
+      border-bottom: 2px solid #cbd5e1;
+      padding: 10px 12px;
+    }
+    /* Fixed Left Columns */
+    .sticky-col-idx {
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      background: #ffffff;
+      min-width: 44px;
+      max-width: 44px;
+      width: 44px;
+      text-align: center;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .sticky-col-adm {
+      position: sticky;
+      left: 44px;
+      z-index: 10;
+      background: #ffffff;
+      min-width: 75px;
+      max-width: 85px;
+      width: 75px;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .sticky-col-name {
+      position: sticky;
+      left: 119px;
+      z-index: 10;
+      background: #ffffff;
+      min-width: 150px;
+      max-width: 190px;
+      width: 160px;
+      border-right: 2px solid #cbd5e1;
+      border-bottom: 1px solid #f1f5f9;
+      box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.08);
+    }
+    /* Top Left Corner intersections have z-index 30 */
+    .sticky-corner-idx {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 30 !important;
+      background: #e2e8f0 !important;
+      min-width: 44px;
+      max-width: 44px;
+      width: 44px;
+      border-right: 1px solid #cbd5e1;
+      border-bottom: 2px solid #94a3b8;
+    }
+    .sticky-corner-adm {
+      position: sticky;
+      top: 0;
+      left: 44px;
+      z-index: 30 !important;
+      background: #e2e8f0 !important;
+      min-width: 75px;
+      max-width: 85px;
+      width: 75px;
+      border-right: 1px solid #cbd5e1;
+      border-bottom: 2px solid #94a3b8;
+    }
+    .sticky-corner-name {
+      position: sticky;
+      top: 0;
+      left: 119px;
+      z-index: 30 !important;
+      background: #e2e8f0 !important;
+      min-width: 150px;
+      max-width: 190px;
+      width: 160px;
+      border-right: 2px solid #cbd5e1;
+      border-bottom: 2px solid #94a3b8;
+      box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.1);
+    }
+    .sticky-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+    .sticky-table tbody tr:hover .sticky-col-idx,
+    .sticky-table tbody tr:hover .sticky-col-adm,
+    .sticky-table tbody tr:hover .sticky-col-name {
+      background-color: #f1f5f9;
+    }
+
+    .activity-bottom-nav {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      #activity-bottom-nav,
+      #activity-more-sheet {
+        display: none !important;
+      }
+      #activity-app.has-desktop-sidebar #side-drawer {
+        transform: translateX(0) !important;
+      }
+      #activity-app:not(.sidebar-collapsed) #side-drawer {
+        width: 16rem;
+      }
+      #activity-app.sidebar-collapsed #side-drawer {
+        width: 4.5rem;
+      }
+      #activity-app:not(.sidebar-collapsed) .activity-main-wrapper,
+      #activity-app:not(.sidebar-collapsed) .attendance-sticky-header {
+        margin-left: 16rem;
+        width: calc(100% - 16rem) !important;
+      }
+      #activity-app.sidebar-collapsed .activity-main-wrapper,
+      #activity-app.sidebar-collapsed .attendance-sticky-header {
+        margin-left: 4.5rem;
+        width: calc(100% - 4.5rem) !important;
+      }
+      #activity-app.sidebar-collapsed #side-drawer .nav-text,
+      #activity-app.sidebar-collapsed #side-drawer .drawer-heading,
+      #activity-app.sidebar-collapsed #side-drawer .drawer-header-title,
+      #activity-app.sidebar-collapsed #side-drawer .sidebar-btn-label {
+        display: none !important;
+      }
+      #activity-app.sidebar-collapsed #side-drawer > div:first-child {
+        justify-content: center !important;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      #activity-app.sidebar-collapsed #side-drawer .drawer-link {
+        justify-content: center !important;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        margin: 4px 6px;
+      }
+      #activity-app.sidebar-collapsed #side-drawer .drawer-link i {
+        font-size: 1.15rem;
+        margin: 0 auto;
+      }
+      #activity-app.sidebar-collapsed #side-drawer .sidebar-footer-btn {
+        justify-content: center !important;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      #activity-app.sidebar-collapsed #sidebar-toggle-icon {
+        transform: rotate(180deg);
+      }
+    }
+
+    @media (max-width: 1023px) {
+      /* Mobile: Hide side drawer, overlay, and header hamburger button */
+      #side-drawer,
+      #drawer-overlay,
+      #activity-mobile-menu-btn {
+        display: none !important;
+      }
+      .activity-main-wrapper, .attendance-sticky-header {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      .activity-main-wrapper {
+        padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      .activity-bottom-nav {
+        position: fixed;
+        left: 8px;
+        right: 8px;
+        bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+        z-index: 40;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        align-items: center;
+        gap: 4px;
+        padding: 5px 4px 6px;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(16px);
+      }
+      .bottom-nav-link {
+        position: relative;
+        min-width: 0;
+        min-height: 48px;
+        border: 0;
+        border-radius: 14px;
+        background: transparent;
+        color: #64748b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        font-size: 10px;
+        font-weight: 700;
+        text-align: center;
+        transition: all 0.2s ease;
+        padding: 4px 2px;
+        text-decoration: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .bottom-nav-link i {
+        font-size: 16px;
+        line-height: 1;
+        transition: all 0.2s ease;
+      }
+      .bottom-nav-link span {
+        line-height: 1.1;
+        white-space: nowrap;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .bottom-nav-link.active {
+        background: #f59e0b !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+      }
+      .bottom-nav-link.active i,
+      .bottom-nav-link.active span {
+        color: #ffffff !important;
+        font-weight: 800;
+      }
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #tab-rewards, #tab-rewards * { visibility: visible; }
+      #tab-rewards { position: absolute; left: 0; top: 0; width: 100% !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 antialiased selection:bg-amber-500 selection:text-white">
+
+  <div id="activity-app" class="min-h-screen has-desktop-sidebar">
+
+    <!-- Top Sticky Header Bar -->
+    <header class="attendance-sticky-header fixed top-0 right-0 h-16 z-30 flex items-center justify-between px-3 sm:px-6">
+      <div class="flex items-center gap-3">
+        <button id="activity-mobile-menu-btn" type="button" class="lg:hidden text-gray-700 hover:text-amber-600 p-2 -ml-1 rounded-lg hover:bg-gray-100 transition flex items-center justify-center focus:outline-none" aria-label="Open Navigation Menu">
+          <i class="fas fa-bars text-lg"></i>
+        </button>
+
+        <div class="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-amber-50 border border-amber-200 shrink-0">
+          <img id="header-logo" src="assets/images/logo.png" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.style.display='none'">
+        </div>
+        <div>
+          <h1 id="header-title" class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">Institution Name</h1>
+          <p id="header-subtitle" class="hidden text-xs text-slate-500 font-medium"><span id="header-regno"></span> <span id="header-sep" class="mx-1 hidden">|</span> <span id="header-place"></span></p>
+        </div>
+      </div>
+
+      <!-- Right Side: Academic Year Badge -->
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-900 shadow-xs">
+          <i class="fas fa-calendar-alt text-amber-600"></i>
+          <span id="header-active-year">Loading Session...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Drawer Overlay Backdrop -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Collapsible Sidebar Navigation Drawer -->
+    <aside id="side-drawer" class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl z-50 flex flex-col border-r border-gray-200">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3 overflow-hidden">
+          <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+            <i class="fas fa-award"></i>
+          </div>
+          <div class="drawer-header-title min-w-0">
+            <h2 class="font-extrabold text-sm text-slate-900 truncate">Activity &amp; Rewards</h2>
+            <p class="text-[10px] text-slate-500 font-bold truncate">Activities, Prayers &amp; Badges</p>
+          </div>
+        </div>
+        <button id="sidebar-collapse-btn" class="text-gray-500 hover:text-amber-600 hover:bg-amber-50 p-2 rounded-lg transition flex items-center justify-center shrink-0" title="Collapse / Expand sidebar">
+          <i id="sidebar-toggle-icon" class="fas fa-angles-left text-base transition-transform duration-300"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
+        <div class="drawer-heading">Overview</div>
+        <a href="#dashboard" class="drawer-link active" data-tab="tab-dashboard" title="Overview Dashboard">
+          <i class="fas fa-gauge-high w-5 text-center shrink-0"></i>
+          <span class="nav-text truncate">Dashboard</span>
+        </a>
+
+        <div class="drawer-heading">Activities &amp; Conduct</div>
+        <a href="#task-setup" class="drawer-link" data-tab="tab-task-setup" title="Manage Activities">
+          <i class="fas fa-plus-circle w-5 text-center shrink-0"></i>
+          <span class="nav-text truncate">Manage Activity</span>
+        </a>
+        <a href="#tasks" class="drawer-link" data-tab="tab-tasks" title="Activity Pointing Matrix">
+          <i class="fas fa-list-check w-5 text-center shrink-0"></i>
+          <span class="nav-text truncate">Activity Pointing</span>
+        </a>
+
+        <div class="drawer-heading">Daily Prayers</div>
+        <a href="#prayer" class="drawer-link" data-tab="tab-prayer" title="Prayer Tracker">
+          <i class="fas fa-hands-praying w-5 text-center shrink-0"></i>
+          <span class="nav-text truncate">Prayer</span>
+        </a>
+
+        <div class="drawer-heading">Gamification &amp; Awards</div>
+        <a href="#rewards" class="drawer-link" data-tab="tab-rewards" title="Rewards, Points &amp; Badges">
+          <i class="fas fa-trophy w-5 text-center shrink-0"></i>
+          <span class="nav-text truncate">Rewards &amp; Points</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer (Only Official Hub and Logout) -->
+      <div class="p-3 border-t border-gray-100 bg-gray-50 flex flex-col gap-2 shrink-0">
+        <a href="official.html" class="sidebar-footer-btn bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 flex items-center justify-center gap-2 w-full p-2.5 rounded-xl font-bold transition text-xs" title="Official Hub">
+          <i class="fas fa-th-large text-amber-600 shrink-0"></i>
+          <span class="sidebar-btn-label truncate">Official Hub</span>
+        </a>
+        <button id="sidebar-logout-btn" type="button" class="sidebar-footer-btn bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center gap-2 w-full p-2.5 rounded-xl font-bold transition text-xs cursor-pointer" title="Sign Out">
+          <i class="fas fa-power-off shrink-0"></i>
+          <span class="sidebar-btn-label truncate">Sign Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="activity-main-wrapper pt-20 px-3 sm:px-6 pb-12 transition-all duration-300">
+      <div class="max-w-7xl mx-auto space-y-5">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: OVERVIEW DASHBOARD                  -->
+        <!-- ========================================== -->
+        <section id="tab-dashboard" class="tab-content space-y-5">
+          <!-- Banner Card -->
+          <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950 text-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-700/50 flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">Overview Dashboard</span>
+                <span id="dash-banner-session" class="text-xs text-slate-300 font-semibold">Active Session</span>
+              </div>
+              <h2 id="dash-welcome-heading" class="text-lg sm:text-2xl font-black text-white">Welcome, Staff Member</h2>
+              <p id="dash-duty-summary" class="text-xs text-slate-300 mt-1 font-medium">Duty Classes: Loading...</p>
+            </div>
+
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-xs p-2 rounded-2xl border border-white/15">
+              <label for="dashboard-class-select" class="text-xs font-bold text-amber-200">Class:</label>
+              <select id="dashboard-class-select" class="p-1.5 px-3 bg-white text-slate-900 font-bold rounded-xl text-xs outline-none focus:ring-2 focus:ring-amber-500"></select>
+            </div>
+          </div>
+
+          <!-- 4 Quick Stats Metric Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <!-- Total Students -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center text-xl shrink-0">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Total Students</div>
+                <div id="dash-stat-students" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">0</div>
+                <div class="text-[11px] text-slate-500 font-semibold truncate">Active Enrolled</div>
+              </div>
+            </div>
+
+            <!-- Today's Prayer Completion -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-xl shrink-0">
+                <i class="fas fa-hands-praying"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Prayer Logged</div>
+                <div id="dash-stat-prayer" class="text-xl sm:text-2xl font-black text-emerald-600 leading-tight">0%</div>
+                <div id="dash-stat-prayer-sub" class="text-[11px] text-slate-500 font-semibold truncate">Today's Record</div>
+              </div>
+            </div>
+
+            <!-- Today's Habits Completion -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center text-xl shrink-0">
+                <i class="fas fa-list-check"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Activities Done</div>
+                <div id="dash-stat-tasks" class="text-xl sm:text-2xl font-black text-blue-600 leading-tight">0%</div>
+                <div id="dash-stat-tasks-sub" class="text-[11px] text-slate-500 font-semibold truncate">Today's Routine</div>
+              </div>
+            </div>
+
+            <!-- Reward Points -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center text-xl shrink-0">
+                <i class="fas fa-medal"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Reward Points</div>
+                <div id="dash-stat-points" class="text-xl sm:text-2xl font-black text-purple-700 leading-tight">0</div>
+                <div id="dash-stat-badges-sub" class="text-[11px] text-slate-500 font-semibold truncate">0 Badges Active</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Itemized Log Breakdown (Prayers & Activities Detail Tables) -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Card 1: Today's Prayers Detailed Audit -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
+              <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-hands-praying text-emerald-600"></i>
+                  <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">Today's Prayers Detail</h3>
+                </div>
+                <button type="button" class="dash-quick-nav px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer" data-target="tab-prayer">
+                  <span>Open Prayer Tracker</span>
+                  <i class="fas fa-arrow-right text-[10px]"></i>
+                </button>
+              </div>
+
+              <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">Prayer</th>
+                      <th class="py-2.5 px-3 text-center">Recorded / Total</th>
+                      <th class="py-2.5 px-2 text-center text-emerald-700">Jama'ah [J]</th>
+                      <th class="py-2.5 px-2 text-center text-blue-700">Ada' [A]</th>
+                      <th class="py-2.5 px-2 text-center text-rose-700">Qaza [Q]</th>
+                      <th class="py-2.5 px-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-prayers-detail-tbody" class="divide-y divide-slate-100 font-medium">
+                    <!-- Dynamically populated with Subh, Zuhr, Asr, Maghrib, Isha, Sunnahs -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Card 2: Today's Activities & Tasks Detailed Audit -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
+              <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-list-check text-blue-600"></i>
+                  <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">Today's Activities &amp; Tasks</h3>
+                </div>
+                <button type="button" class="dash-quick-nav px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer" data-target="tab-tasks">
+                  <span>Open Activity Pointing</span>
+                  <i class="fas fa-arrow-right text-[10px]"></i>
+                </button>
+              </div>
+
+              <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-100/70 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">Activity / Task</th>
+                      <th class="py-2.5 px-3 text-center">Cadence</th>
+                      <th class="py-2.5 px-3 text-center">Completed</th>
+                      <th class="py-2.5 px-3 text-center">Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-tasks-detail-tbody" class="divide-y divide-slate-100 font-medium">
+                    <!-- Dynamically populated with each configured task -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Past Days Incomplete & Pending Logs Alert Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-5 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+                  <i class="fas fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                  <h3 class="font-black text-sm text-slate-900">Past Days Pending Logs Tracker</h3>
+                  <p class="text-[11px] text-slate-500 font-medium">Review and complete missing or unlogged days from the past 7 days</p>
+                </div>
+              </div>
+              <span id="dash-backlog-summary-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Checking backlog...</span>
+            </div>
+
+            <!-- Dynamic Backlog Alert Container -->
+            <div id="dash-backlog-container" class="space-y-2">
+              <div class="p-6 text-center text-slate-400 font-bold text-xs">Scanning recent days for missing logs...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: MANAGE & ADD ACTIVITIES             -->
+        <!-- ========================================== -->
+        <section id="tab-task-setup" class="tab-content hidden space-y-5">
+          <!-- Add New Task Card -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+                  <i class="fas fa-plus"></i>
+                </div>
+                <div>
+                  <h3 class="font-extrabold text-sm text-slate-900">Add New Activity</h3>
+                  <p class="text-[11px] text-slate-500 font-semibold">Configure routine activities for Daily, Weekly or Monthly cadence</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">Custom Setup</span>
+            </div>
+
+            <form id="form-add-task-def" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+              <div class="md:col-span-2">
+                <label for="task-def-title" class="block font-bold text-slate-700 mb-1">Activity Title <span class="text-rose-500">*</span></label>
+                <input type="text" id="task-def-title" placeholder="e.g. Morning Adhkar, Cleanliness, Surah Al-Kahf" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:border-amber-500" required>
+              </div>
+
+              <div>
+                <label for="task-def-cadence" class="block font-bold text-slate-700 mb-1">Cadence / Frequency <span class="text-rose-500">*</span></label>
+                <select id="task-def-cadence" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-800 outline-none focus:border-amber-500">
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+
+              <div id="wrapper-task-day-week" class="hidden">
+                <label for="task-def-day-week" class="block font-bold text-slate-700 mb-1">Designated Day (Optional)</label>
+                <select id="task-def-day-week" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-800 outline-none focus:border-amber-500">
+                  <option value="">Any Day (Unfixed)</option>
+                  <option value="Friday">Friday (Jumu'ah)</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                </select>
+              </div>
+
+              <div id="wrapper-task-day-month" class="hidden">
+                <label for="task-def-day-month" class="block font-bold text-slate-700 mb-1">Designated Day / Date (Optional)</label>
+                <select id="task-def-day-month" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-800 outline-none focus:border-amber-500">
+                  <option value="">Any Date (Unfixed)</option>
+                  <option value="1st of Month">1st of Month</option>
+                  <option value="2nd of Month">2nd of Month</option>
+                  <option value="3rd of Month">3rd of Month</option>
+                  <option value="4th of Month">4th of Month</option>
+                  <option value="5th of Month">5th of Month</option>
+                  <option value="6th of Month">6th of Month</option>
+                  <option value="7th of Month">7th of Month</option>
+                  <option value="8th of Month">8th of Month</option>
+                  <option value="9th of Month">9th of Month</option>
+                  <option value="10th of Month">10th of Month</option>
+                  <option value="11th of Month">11th of Month</option>
+                  <option value="12th of Month">12th of Month</option>
+                  <option value="13th of Month">13th of Month</option>
+                  <option value="14th of Month">14th of Month</option>
+                  <option value="15th of Month">15th of Month</option>
+                  <option value="16th of Month">16th of Month</option>
+                  <option value="17th of Month">17th of Month</option>
+                  <option value="18th of Month">18th of Month</option>
+                  <option value="19th of Month">19th of Month</option>
+                  <option value="20th of Month">20th of Month</option>
+                  <option value="21st of Month">21st of Month</option>
+                  <option value="22nd of Month">22nd of Month</option>
+                  <option value="23rd of Month">23rd of Month</option>
+                  <option value="24th of Month">24th of Month</option>
+                  <option value="25th of Month">25th of Month</option>
+                  <option value="26th of Month">26th of Month</option>
+                  <option value="27th of Month">27th of Month</option>
+                  <option value="28th of Month">28th of Month</option>
+                  <option value="29th of Month">29th of Month</option>
+                  <option value="30th of Month">30th of Month</option>
+                  <option value="31st of Month">31st of Month</option>
+                  <option value="Last Day of Month">Last Day of Month</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="task-def-points" class="block font-bold text-slate-700 mb-1">Reward Points <span class="text-rose-500">*</span></label>
+                <input type="number" id="task-def-points" value="5" min="1" max="100" class="w-full p-2.5 border border-slate-300 rounded-xl font-black text-center text-slate-800 outline-none focus:border-amber-500" required>
+              </div>
+
+              <div class="md:col-span-4 flex justify-end gap-2 pt-2">
+                <button type="submit" id="btn-save-new-task-def" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                  <i class="fas fa-plus"></i> Add &amp; Save Activity
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- All Configured Tasks List -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-list-check text-amber-600"></i>
+                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">All Configured Activities</h3>
+              </div>
+              <div class="flex items-center gap-1">
+                <button type="button" class="task-def-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white" data-filter="all">All</button>
+                <button type="button" class="task-def-filter-btn px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-200" data-filter="daily">Daily</button>
+                <button type="button" class="task-def-filter-btn px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-200" data-filter="weekly">Weekly</button>
+                <button type="button" class="task-def-filter-btn px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-200" data-filter="monthly">Monthly</button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200">
+                    <th class="py-2.5 px-3">#</th>
+                    <th class="py-2.5 px-4">Activity Title</th>
+                    <th class="py-2.5 px-3 text-center">Frequency</th>
+                    <th class="py-2.5 px-3 text-center">Schedule / Day</th>
+                    <th class="py-2.5 px-3 text-center">Points</th>
+                    <th class="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="task-defs-table-tbody" class="divide-y divide-slate-100 font-medium">
+                  <!-- Dynamically populated with Edit & Delete buttons -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: ACTIVITY POINTING MATRIX            -->
+        <!-- ========================================== -->
+        <section id="tab-tasks" class="tab-content hidden space-y-4">
+          <!-- Controls Bar -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
+              <div>
+                <label for="tasks-class-select" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Class</label>
+                <select id="tasks-class-select" class="p-2 border border-slate-300 rounded-xl bg-white text-xs font-bold text-slate-800 outline-none focus:border-amber-500"></select>
+              </div>
+              <div>
+                <label for="tasks-date-input" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Date</label>
+                <input type="date" id="tasks-date-input" class="p-1.5 border border-slate-300 rounded-xl bg-white text-xs font-bold text-slate-800 outline-none focus:border-amber-500">
+              </div>
+
+              <!-- Cadence Filters (With ALL option) -->
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Cadence</label>
+                <div class="inline-flex rounded-xl border border-slate-200 p-0.5 bg-slate-100">
+                  <button type="button" class="tasks-freq-btn px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer text-slate-600 hover:bg-slate-200" data-freq="all">All</button>
+                  <button type="button" class="tasks-freq-btn px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer bg-amber-500 text-white shadow-2xs" data-freq="daily">Daily</button>
+                  <button type="button" id="btn-tasks-cadence-weekly" class="tasks-freq-btn px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer text-slate-600 hover:bg-slate-200" data-freq="weekly">Weekly</button>
+                  <button type="button" id="btn-tasks-cadence-monthly" class="tasks-freq-btn px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer text-slate-600 hover:bg-slate-200" data-freq="monthly">Monthly</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons (Strict Explicit Save Workflow) -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="tasks-unsaved-badge" class="hidden text-amber-700 bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-xl font-bold text-xs">
+                <i class="fas fa-clock mr-1"></i>Unsaved Changes
+              </span>
+              <button type="button" id="btn-save-tasks" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <i class="fas fa-floppy-disk"></i> Save Activities Log
+              </button>
+              <button type="button" id="btn-tasks-clear-all" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition cursor-pointer">
+                Clear All
+              </button>
+              <button type="button" class="dash-quick-nav px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5 cursor-pointer" data-target="tab-task-setup">
+                <i class="fas fa-plus"></i> Manage Activity
+              </button>
+            </div>
+          </div>
+
+          <!-- Sticky 2D Frozen Tasks Matrix Table Container -->
+          <div class="sticky-table-container shadow-2xs">
+            <table class="sticky-table text-left text-xs">
+              <thead id="tasks-roster-thead">
+                <!-- Dynamically populated with sticky columns and task headers -->
+              </thead>
+              <tbody id="tasks-roster-tbody" class="divide-y divide-slate-100 font-medium">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: PRAYER TRACKER                      -->
+        <!-- ========================================== -->
+        <section id="tab-prayer" class="tab-content hidden space-y-4">
+          <!-- Prayer Disabled Banner (Shows when Feature is Turned OFF) -->
+          <div id="prayer-feature-disabled-banner" class="hidden p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-bold flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <i class="fas fa-ban text-rose-600 text-base shrink-0"></i>
+              <span><strong>Prayer Tracking is currently DISABLED.</strong> Daily prayer checklists and points are hidden from students across the Student Portal.</span>
+            </div>
+            <button type="button" id="btn-banner-enable-prayer" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs transition shadow-2xs shrink-0 cursor-pointer">
+              Turn ON Prayer Tracking
+            </button>
+          </div>
+
+          <!-- Controls Bar -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
+              <div>
+                <label for="prayer-class-select" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Class</label>
+                <select id="prayer-class-select" class="p-2 border border-slate-300 rounded-xl bg-white text-xs font-bold text-slate-800 outline-none focus:border-amber-500"></select>
+              </div>
+              <div>
+                <label for="prayer-date-input" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Date</label>
+                <input type="date" id="prayer-date-input" class="p-1.5 border border-slate-300 rounded-xl bg-white text-xs font-bold text-slate-800 outline-none focus:border-amber-500">
+              </div>
+            </div>
+
+            <!-- Action Buttons (Strict Explicit Save Workflow + Prayer Rules Button + Feature Toggle) -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="prayer-unsaved-badge" class="hidden text-amber-700 bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-xl font-bold text-xs">
+                <i class="fas fa-clock mr-1"></i>Unsaved Changes
+              </span>
+              <button type="button" id="btn-toggle-prayer-feature" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Toggle Prayer Tracking Feature ON/OFF">
+                <i class="fas fa-toggle-on text-emerald-600 text-sm" id="prayer-toggle-feature-icon"></i>
+                <span id="prayer-toggle-feature-label">Prayer: ON</span>
+              </button>
+              <button type="button" id="btn-open-prayer-points-config" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Configure custom points for Jama'ah, Ada', and Qaza">
+                <i class="fas fa-sliders text-amber-600"></i> Prayer Points Rules
+              </button>
+              <button type="button" id="btn-open-custom-prayer" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                <i class="fas fa-plus text-amber-600"></i> Add Sunnah Prayer
+              </button>
+              <button type="button" id="btn-save-prayer" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1 cursor-pointer">
+                <i class="fas fa-floppy-disk"></i> Save Prayer Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Prayer Points Status Legend -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center justify-around flex-wrap gap-2 text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-600 text-white">J</span>
+              <span class="text-slate-700"><strong>Jama'ah (Congregation):</strong> In Masjid (<span id="legend-pts-jamaah" class="font-bold text-emerald-700">+15</span> pts)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-blue-600 text-white">A</span>
+              <span class="text-slate-700"><strong>Ada' (On-Time):</strong> Individual (<span id="legend-pts-adaa" class="font-bold text-blue-700">+10</span> pts)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-600 text-white">Q</span>
+              <span class="text-slate-700"><strong>Qaza (Missed):</strong> Late or missed (<span id="legend-pts-qaza" class="font-bold text-rose-700">0</span> pts)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500 text-white">S</span>
+              <span class="text-slate-700"><strong>Sunnah:</strong> Extra prayers (<span id="legend-pts-sunnah" class="font-bold text-amber-700">+5</span> pts)</span>
+            </div>
+          </div>
+
+          <!-- Sticky 2D Frozen Prayer Roster Matrix Container -->
+          <div class="sticky-table-container shadow-2xs">
+            <table class="sticky-table text-left text-xs">
+              <thead id="prayer-roster-thead">
+                <!-- Dynamically populated: 5 Fard prayers + custom Sunnahs, with [J] [A] [Q] bulk buttons under each heading -->
+              </thead>
+              <tbody id="prayer-roster-tbody" class="divide-y divide-slate-100 font-medium">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: REWARDS & POINTS LEADERBOARD        -->
+        <!-- ========================================== -->
+        <section id="tab-rewards" class="tab-content hidden space-y-4">
+          <!-- Controls Bar -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
+              <div>
+                <label for="rewards-class-select" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Class Filter</label>
+                <select id="rewards-class-select" class="p-2 border border-slate-300 rounded-xl bg-white text-xs font-bold text-slate-800 outline-none focus:border-amber-500"></select>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" id="btn-open-self-logging" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Enable or disable student self-logging per class">
+                <i class="fas fa-user-pen text-indigo-600"></i> Student Self-Logging
+              </button>
+              <button type="button" id="btn-rewards-settings" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Configure custom points and rubric weights">
+                <i class="fas fa-sliders text-amber-600"></i> Rubric &amp; Points Settings
+              </button>
+              <button type="button" id="btn-open-award-points" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                <i class="fas fa-plus"></i> Award Bonus Points
+              </button>
+              <button type="button" id="btn-print-leaderboard" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fas fa-print"></i> Print Leaderboard
+              </button>
+            </div>
+          </div>
+
+          <!-- Period Filter & History Navigator Bar -->
+          <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-2.5">
+            <!-- Period Cadence Tabs -->
+            <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl" id="rewards-period-tabs">
+              <button type="button" class="btn-rewards-period px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer bg-white text-amber-700 shadow-2xs" data-period="daily">
+                Daily
+              </button>
+              <button type="button" class="btn-rewards-period px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer" data-period="weekly">
+                Weekly
+              </button>
+              <button type="button" class="btn-rewards-period px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer" data-period="monthly">
+                Monthly
+              </button>
+              <button type="button" class="btn-rewards-period px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer" data-period="yearly">
+                Academic Year
+              </button>
+            </div>
+
+            <!-- History Navigation Controls -->
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-rewards-prev-period" class="p-1.5 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Previous Period / History">
+                <i class="fas fa-chevron-left"></i> <span class="hidden sm:inline">Prev</span>
+              </button>
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-200 bg-amber-50/60 text-amber-900 text-xs font-black" id="rewards-period-label-box">
+                <i class="fas fa-calendar-day text-amber-600"></i>
+                <span id="rewards-period-display-label">Today</span>
+              </div>
+              <button type="button" id="btn-rewards-next-period" class="p-1.5 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Next Period">
+                <span class="hidden sm:inline">Next</span> <i class="fas fa-chevron-right"></i>
+              </button>
+              <button type="button" id="btn-rewards-current-period" class="px-2.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs transition shadow-2xs cursor-pointer" title="Jump to Current Period">
+                Current
+              </button>
+            </div>
+          </div>
+
+          <!-- Top 3 Podium Card -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Rank 1 Winner -->
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md flex items-center gap-4 relative overflow-hidden order-1 md:order-2">
+              <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-3xl font-black">
+                🥇
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-amber-100">Top Rank &bull; 1st Place</span>
+                <h3 id="rewards-top-student-name" class="font-extrabold text-base leading-tight">Student Name</h3>
+                <p id="rewards-top-student-points" class="text-xs font-bold text-amber-100 mt-0.5">0 Points</p>
+              </div>
+            </div>
+
+            <!-- Class Stats Card -->
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center gap-4 order-2 md:order-1">
+              <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center text-xl font-bold">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Class Average</span>
+                <h4 id="rewards-class-avg-points" class="font-black text-xl text-slate-900 leading-tight">0</h4>
+                <p class="text-[10px] text-slate-500 font-bold">Points per Student</p>
+              </div>
+            </div>
+
+            <!-- Total Badges Card -->
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center gap-4 order-3">
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center text-xl font-bold">
+                <i class="fas fa-medal"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Badges Active</span>
+                <h4 id="rewards-total-badges" class="font-black text-xl text-amber-700 leading-tight">0</h4>
+                <p class="text-[10px] text-slate-500 font-bold">Honor Badges Active</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaderboard Table Container -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+            <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-trophy text-amber-500"></i>
+                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider">Class Activity &amp; Conduct Leaderboard</h3>
+              </div>
+              <span class="text-xs text-slate-500 font-semibold">Aggregated points from attendance, prayers, tasks &amp; badges</span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-extrabold tracking-wider border-b border-slate-200">
+                    <th class="py-2.5 px-3 text-center">Rank</th>
+                    <th class="py-2.5 px-3">Adm No</th>
+                    <th class="py-2.5 px-4">Student Name</th>
+                    <th class="py-2.5 px-3 text-center">Att. Pts</th>
+                    <th class="py-2.5 px-3 text-center">Prayer Pts</th>
+                    <th class="py-2.5 px-3 text-center">Activity Pts</th>
+                    <th class="py-2.5 px-3 text-center">Bonus Pts</th>
+                    <th class="py-2.5 px-3 text-center">Total Points</th>
+                    <th class="py-2.5 px-4">Badges &amp; Honors</th>
+                    <th class="py-2.5 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rewards-leaderboard-tbody" class="divide-y divide-slate-100 font-medium">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODALS                                     -->
+  <!-- ========================================== -->
+
+  <!-- 1. Modal: Add & Manage Custom Sunnah Prayer -->
+  <div id="modal-custom-prayer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-hands-praying"></i>
+          </div>
+          <h3 class="font-black text-sm text-slate-800">Manage Extra Sunnah Prayers</h3>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-custom-prayer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div class="sm:col-span-2">
+              <label class="block font-bold text-slate-600 mb-1">Prayer Name <span class="text-rose-500">*</span></label>
+              <input type="text" id="modal-prayer-name-input" placeholder="e.g. Tahajjud, Duha, Vitr" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-600 mb-1">Points <span class="text-rose-500">*</span></label>
+              <div class="flex gap-2">
+                <input type="number" id="modal-prayer-points-input" value="5" min="1" max="100" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:border-amber-500">
+                <button type="button" id="btn-add-custom-prayer-item" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition cursor-pointer">
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">Default 5 Fard prayers are always active. Add optional Sunnah prayers with specific individual points here.</p>
+        </div>
+
+        <div>
+          <div class="font-bold text-slate-700 mb-2">Active Custom Sunnah Prayers:</div>
+          <div id="custom-prayers-list" class="space-y-1.5 max-h-48 overflow-y-auto">
+            <!-- Dynamically populated list of custom prayers with edit and delete buttons -->
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex justify-end">
+          <button type="button" class="btn-close-modal py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition cursor-pointer" data-modal="modal-custom-prayer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Modal: Assign / Manage Custom Badge -->
+  <div id="modal-custom-badge" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-medal"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-sm text-slate-800">Assign Custom Student Badge</h3>
+            <p id="modal-badge-student-sub" class="text-[11px] text-amber-700 font-bold">Student Name</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-custom-badge">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <input type="hidden" id="modal-badge-student-id">
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Custom Badge Name <span class="text-rose-500">*</span></label>
+          <div class="flex gap-2">
+            <input type="text" id="modal-badge-input" placeholder="e.g. Star Reciter, Disciplined, Best Adab" class="flex-1 p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:border-amber-500">
+            <button type="button" id="btn-save-custom-badge" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition cursor-pointer">
+              Assign
+            </button>
+          </div>
+          <!-- Preset Badge Chips -->
+          <div class="flex items-center gap-1.5 flex-wrap mt-2">
+            <button type="button" class="btn-preset-badge px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-amber-100 border border-slate-200 cursor-pointer" data-badge="Exemplary Adab">Exemplary Adab</button>
+            <button type="button" class="btn-preset-badge px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-amber-100 border border-slate-200 cursor-pointer" data-badge="Star Reciter">Star Reciter</button>
+            <button type="button" class="btn-preset-badge px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-amber-100 border border-slate-200 cursor-pointer" data-badge="Helpful Peer">Helpful Peer</button>
+            <button type="button" class="btn-preset-badge px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-amber-100 border border-slate-200 cursor-pointer" data-badge="Tahajjud Hero">Tahajjud Hero</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="font-bold text-slate-700 mb-2">Student's Current Custom Badges:</div>
+          <div id="student-custom-badges-container" class="flex flex-wrap gap-1.5 min-h-12 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+            <!-- Dynamically populated chips with edit and remove buttons -->
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex justify-end">
+          <button type="button" class="btn-close-modal py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition cursor-pointer" data-modal="modal-custom-badge">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Modal: Award Bonus Points -->
+  <div id="modal-award-points" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-medal"></i>
+          </div>
+          <h3 class="font-black text-sm text-slate-800">Award Student Bonus Points</h3>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-award-points">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Select Student <span class="text-rose-500">*</span></label>
+          <select id="modal-award-student-select" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none"></select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Points to Award</label>
+          <div class="grid grid-cols-4 gap-1.5 pt-1">
+            <button type="button" class="btn-preset-pts py-1.5 rounded-lg border border-slate-200 font-black text-slate-700 hover:bg-amber-50 cursor-pointer" data-pts="5">+5 pts</button>
+            <button type="button" class="btn-preset-pts py-1.5 rounded-lg border border-slate-200 font-black text-slate-700 hover:bg-amber-50 cursor-pointer" data-pts="10">+10 pts</button>
+            <button type="button" class="btn-preset-pts py-1.5 rounded-lg border border-slate-200 font-black text-slate-700 hover:bg-amber-50 cursor-pointer" data-pts="20">+20 pts</button>
+            <button type="button" class="btn-preset-pts py-1.5 rounded-lg border border-slate-200 font-black text-slate-700 hover:bg-amber-50 cursor-pointer" data-pts="50">+50 pts</button>
+          </div>
+          <input type="number" id="modal-award-points-input" value="10" min="1" max="100" class="w-full mt-2 p-2.5 border border-slate-300 rounded-xl font-black text-center text-slate-800 outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Reason / Excellence Note <span class="text-rose-500">*</span></label>
+          <input type="text" id="modal-award-reason" placeholder="e.g. Exceptional Adab, Helping Classmates, Punctual Prayer" class="w-full p-2.5 border border-slate-300 rounded-xl font-semibold text-slate-800 outline-none focus:border-amber-500">
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="btn-submit-award-points" class="flex-grow py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+            Award Points &amp; Log Honor
+          </button>
+          <button type="button" class="btn-close-modal py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer" data-modal="modal-award-points">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Modal: Manage Student Bonus Points History -->
+  <div id="modal-student-bonus-history" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-history"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-sm text-slate-800">Student Bonus Points History</h3>
+            <p id="modal-bonus-history-student-sub" class="text-[11px] text-amber-700 font-bold">Student Name</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-student-bonus-history">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <input type="hidden" id="modal-bonus-history-student-id">
+
+        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div>
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Total Bonus Points</span>
+            <div id="modal-bonus-history-total" class="font-black text-base text-purple-700 leading-tight">0 pts</div>
+          </div>
+          <button type="button" id="btn-history-award-new" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs transition cursor-pointer">
+            <i class="fas fa-plus mr-1"></i>+ Award Points
+          </button>
+        </div>
+
+        <div class="overflow-x-auto max-h-64 overflow-y-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 sticky top-0">
+              <tr>
+                <th class="py-2 px-3">Date</th>
+                <th class="py-2 px-3">Points</th>
+                <th class="py-2 px-3">Reason</th>
+                <th class="py-2 px-3">Awarded By</th>
+                <th class="py-2 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bonus-history-table-tbody" class="divide-y divide-slate-100 font-medium">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex justify-end">
+          <button type="button" class="btn-close-modal py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition cursor-pointer" data-modal="modal-student-bonus-history">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Modal: Edit Activity Definition -->
+  <div id="modal-edit-task-def" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-edit"></i>
+          </div>
+          <h3 class="font-black text-sm text-slate-800">Edit Activity Definition</h3>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-edit-task-def">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-task-def" class="p-5 space-y-3 text-xs">
+        <input type="hidden" id="edit-task-id">
+
+        <div>
+          <label for="edit-task-title" class="block font-bold text-slate-700 mb-1">Activity Title <span class="text-rose-500">*</span></label>
+          <input type="text" id="edit-task-title" class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 outline-none focus:border-amber-500" required>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="edit-task-cadence" class="block font-bold text-slate-700 mb-1">Cadence / Frequency</label>
+            <select id="edit-task-cadence" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-800 outline-none">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <div>
+            <label for="edit-task-points" class="block font-bold text-slate-700 mb-1">Reward Points</label>
+            <input type="number" id="edit-task-points" min="1" max="100" class="w-full p-2.5 border border-slate-300 rounded-xl font-black text-center text-slate-800 outline-none" required>
+          </div>
+        </div>
+
+        <div id="wrapper-edit-task-day-week" class="hidden">
+          <label for="edit-task-day-week" class="block font-bold text-slate-700 mb-1">Designated Day (Optional)</label>
+          <select id="edit-task-day-week" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-800 outline-none">
+            <option value="">Any Day (Unfixed)</option>
+            <option value="Friday">Friday (Jumu'ah)</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+          </select>
+        </div>
+
+        <div id="wrapper-edit-task-day-month" class="hidden">
+          <label for="edit-task-day-month" class="block font-bold text-slate-700 mb-1">Designated Day / Date (Optional)</label>
+          <select id="edit-task-day-month" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-bold text-slate-800 outline-none">
+            <option value="">Any Date (Unfixed)</option>
+            <option value="1st of Month">1st of Month</option>
+            <option value="2nd of Month">2nd of Month</option>
+            <option value="3rd of Month">3rd of Month</option>
+            <option value="4th of Month">4th of Month</option>
+            <option value="5th of Month">5th of Month</option>
+            <option value="6th of Month">6th of Month</option>
+            <option value="7th of Month">7th of Month</option>
+            <option value="8th of Month">8th of Month</option>
+            <option value="9th of Month">9th of Month</option>
+            <option value="10th of Month">10th of Month</option>
+            <option value="11th of Month">11th of Month</option>
+            <option value="12th of Month">12th of Month</option>
+            <option value="13th of Month">13th of Month</option>
+            <option value="14th of Month">14th of Month</option>
+            <option value="15th of Month">15th of Month</option>
+            <option value="16th of Month">16th of Month</option>
+            <option value="17th of Month">17th of Month</option>
+            <option value="18th of Month">18th of Month</option>
+            <option value="19th of Month">19th of Month</option>
+            <option value="20th of Month">20th of Month</option>
+            <option value="21st of Month">21st of Month</option>
+            <option value="22nd of Month">22nd of Month</option>
+            <option value="23rd of Month">23rd of Month</option>
+            <option value="24th of Month">24th of Month</option>
+            <option value="25th of Month">25th of Month</option>
+            <option value="26th of Month">26th of Month</option>
+            <option value="27th of Month">27th of Month</option>
+            <option value="28th of Month">28th of Month</option>
+            <option value="29th of Month">29th of Month</option>
+            <option value="30th of Month">30th of Month</option>
+            <option value="31st of Month">31st of Month</option>
+            <option value="Last Day of Month">Last Day of Month</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="submit" id="btn-save-edit-task-def" class="flex-grow py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+            Save Changes
+          </button>
+          <button type="button" class="btn-close-modal py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer" data-modal="modal-edit-task-def">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Modal: Configure Prayer Points Rules (Jama'ah, Ada', Qaza with Minus Marks) -->
+  <div id="modal-prayer-points-config" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-sliders"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-sm text-slate-800">Prayer Points Rules</h3>
+            <p class="text-[10px] text-amber-700 font-bold">Applies to all 5 Fard prayers automatically</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-prayer-points-config">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3.5 text-xs">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <span class="text-[11px] font-bold text-slate-700">Unified Fard Prayer Rules:</span>
+          <p class="text-[10px] text-slate-500">Configure points for each prayer status once. Supports positive marks, zero, or minus/penalty marks (e.g., -5 for Qaza). These rules automatically govern all 5 Fard prayers across the institution.</p>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between p-2.5 border border-emerald-200 bg-emerald-50/50 rounded-xl">
+            <div>
+              <div class="font-black text-emerald-900">Jama'ah [J] (Masjid / Congregation)</div>
+              <div class="text-[10px] text-emerald-700">Points for praying in congregation</div>
+            </div>
+            <input type="number" id="modal-prayer-pts-jamaah" value="15" min="-100" max="100" class="w-20 p-2 border border-emerald-300 bg-white rounded-xl font-black text-center text-emerald-900 outline-none">
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 border border-blue-200 bg-blue-50/50 rounded-xl">
+            <div>
+              <div class="font-black text-blue-900">Ada' [A] (On-Time Individual)</div>
+              <div class="text-[10px] text-blue-700">Points for praying on-time individually</div>
+            </div>
+            <input type="number" id="modal-prayer-pts-adaa" value="10" min="-100" max="100" class="w-20 p-2 border border-blue-300 bg-white rounded-xl font-black text-center text-blue-900 outline-none">
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 border border-rose-200 bg-rose-50/50 rounded-xl">
+            <div>
+              <div class="font-black text-rose-900">Qaza [Q] (Missed or Late)</div>
+              <div class="text-[10px] text-rose-700">Supports negative penalty marks (e.g. -5, -10, or 0)</div>
+            </div>
+            <input type="number" id="modal-prayer-pts-qaza" value="0" min="-100" max="100" class="w-20 p-2 border border-rose-300 bg-white rounded-xl font-black text-center text-rose-900 outline-none">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+          <button type="button" id="btn-save-prayer-points-config" class="flex-grow py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+            Save &amp; Apply to All Prayers
+          </button>
+          <button type="button" class="btn-close-modal py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer" data-modal="modal-prayer-points-config">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Modal: Rewards & Points Rubric Settings -->
+  <div id="modal-rewards-settings" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-4 bg-amber-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm">
+            <i class="fas fa-sliders"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-sm text-slate-800">Configure Points &amp; Rubric</h3>
+            <p class="text-[11px] text-amber-700 font-bold">Custom point weights adaptable for any institutional curriculum</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer" data-modal="modal-rewards-settings">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs max-h-[80vh] overflow-y-auto">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+            <div>
+              <div class="font-black text-slate-800">Daily Attendance Regularity</div>
+              <div class="text-[11px] text-slate-500">Points awarded per present day</div>
+            </div>
+            <input type="number" id="rubric-pts-attendance" value="5" min="0" max="50" class="w-20 p-2 border border-slate-300 rounded-xl font-black text-center text-slate-800 outline-none">
+          </div>
+
+          <div class="flex items-center justify-between p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+            <div>
+              <div class="font-black text-slate-800">Activity Completion</div>
+              <div class="text-[11px] text-slate-500">Default points per completed activity</div>
+            </div>
+            <input type="number" id="rubric-pts-task" value="10" min="0" max="50" class="w-20 p-2 border border-slate-300 rounded-xl font-black text-center text-slate-800 outline-none">
+          </div>
+        </div>
+
+        <!-- Points Scope & Cadence Configuration -->
+        <div class="border-t border-slate-200 pt-3 space-y-3">
+          <div class="font-extrabold text-xs uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+            <i class="fas fa-calendar-check text-amber-600"></i> Points Evaluation Cadence &amp; Reset Rules
+          </div>
+          <p class="text-[11px] text-slate-500">Choose how Total Points are calculated and reset in the Student Portal and Leaderboard:</p>
+
+          <div class="p-3 border border-slate-200 rounded-2xl bg-slate-50 space-y-2.5">
+            <div>
+              <label for="rubric-points-scope" class="block font-bold text-slate-700 mb-1">Active Evaluation Scope</label>
+              <select id="rubric-points-scope" class="w-full p-2 border border-slate-300 rounded-xl font-bold bg-white text-slate-800 text-xs outline-none focus:border-amber-500">
+                <option value="daily">Daily (24 Hours - Resets every midnight)</option>
+                <option value="weekly">Weekly (Active Week - Resets on boundary day)</option>
+                <option value="monthly">Monthly (Active Month - Resets on boundary day)</option>
+                <option value="yearly">Academic Year (Full session cumulative)</option>
+              </select>
+            </div>
+
+            <div id="rubric-weekly-day-box">
+              <label for="rubric-weekly-reset-day" class="block font-bold text-slate-700 mb-1">Weekly Reset Day</label>
+              <select id="rubric-weekly-reset-day" class="w-full p-2 border border-slate-300 rounded-xl font-bold bg-white text-slate-800 text-xs outline-none focus:border-amber-500">
+                <option value="sunday">Sunday (New cycle starts Monday)</option>
+                <option value="monday">Monday (New cycle starts Tuesday)</option>
+                <option value="thursday">Thursday (New cycle starts Friday)</option>
+                <option value="friday">Friday (New cycle starts Saturday)</option>
+                <option value="saturday">Saturday (New cycle starts Sunday)</option>
+              </select>
+            </div>
+
+            <div id="rubric-monthly-day-box">
+              <label for="rubric-monthly-reset-day" class="block font-bold text-slate-700 mb-1">Monthly Reset Boundary</label>
+              <select id="rubric-monthly-reset-day" class="w-full p-2 border border-slate-300 rounded-xl font-bold bg-white text-slate-800 text-xs outline-none focus:border-amber-500">
+                <option value="1">1st of Every Month</option>
+                <option value="15">15th of Every Month</option>
+                <option value="25">25th of Every Month</option>
+                <option value="28">28th / End of Month</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="btn-save-rewards-settings" class="flex-grow py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+            Save Rubric Settings
+          </button>
+          <button type="button" class="btn-close-modal py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer" data-modal="modal-rewards-settings">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Modal: In-App Action Confirmation -->
+  <div id="modal-confirm-action" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div class="p-5 text-center space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center text-xl mx-auto">
+          <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <h3 id="modal-confirm-title" class="font-black text-sm text-slate-900">Confirm Action</h3>
+        <p id="modal-confirm-msg" class="text-xs text-slate-500">Are you sure you want to perform this action? This operation cannot be undone.</p>
+        <div class="flex items-center gap-2 pt-3">
+          <button type="button" id="btn-confirm-action-ok" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+            Yes, Confirm
+          </button>
+          <button type="button" id="btn-confirm-action-cancel" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Modal: Student Self-Logging Permissions -->
+  <div id="modal-student-self-logging" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all flex flex-col max-h-[85vh]">
+      <div class="p-4 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <i class="fas fa-user-pen"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-sm text-slate-800">Student Self-Logging Permissions</h3>
+            <p class="text-[11px] text-indigo-700 font-semibold" id="self-logging-role-scope">Configure self-logging for each class</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-slate-400 hover:text-slate-600 text-sm p-1.5 rounded-lg hover:bg-white/80 transition cursor-pointer" data-modal="modal-student-self-logging">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-5 space-y-3.5 text-xs overflow-y-auto flex-1">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-start gap-2.5 text-slate-600">
+          <i class="fas fa-info-circle text-indigo-600 mt-0.5 text-sm shrink-0"></i>
+          <div>
+            When enabled for a class, students in that class can log their daily 5 prayers and assigned activity progress directly in their Student Portal. Default is <strong>OFF</strong>.
+          </div>
+        </div>
+
+        <div id="self-logging-admin-actions" class="flex items-center justify-between gap-2 p-2.5 bg-indigo-50/50 rounded-xl border border-indigo-100 hidden">
+          <span class="text-[11px] font-bold text-indigo-900">Quick Actions (Admin):</span>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-self-logging-enable-all" class="px-2.5 py-1 bg-white hover:bg-indigo-600 hover:text-white border border-indigo-200 text-indigo-700 rounded-lg text-[11px] font-bold transition shadow-2xs cursor-pointer">Enable All</button>
+            <button type="button" id="btn-self-logging-disable-all" class="px-2.5 py-1 bg-white hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-lg text-[11px] font-bold transition shadow-2xs cursor-pointer">Disable All</button>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-500 mb-2 px-1">Class Permissions</h4>
+          <div id="self-logging-classes-list" class="space-y-2">
+            <!-- Injected by JS: per-class toggle rows -->
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2 shrink-0">
+        <button type="button" id="btn-save-self-logging" class="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+          Save Permissions
+        </button>
+        <button type="button" class="btn-close-modal py-2.5 px-4 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer" data-modal="modal-student-self-logging">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION (Phones only)     -->
+  <!-- ========================================== -->
+  <nav id="activity-bottom-nav" class="activity-bottom-nav" aria-label="Mobile Navigation">
+    <button type="button" class="bottom-nav-link active" data-tab="tab-dashboard" aria-label="Overview Dashboard">
+      <i class="fas fa-gauge-high"></i>
+      <span>Dashboard</span>
+    </button>
+    <button type="button" class="bottom-nav-link" data-tab="tab-task-setup" aria-label="Manage Activities">
+      <i class="fas fa-plus-circle"></i>
+      <span>Activities</span>
+    </button>
+    <button type="button" class="bottom-nav-link" data-tab="tab-tasks" aria-label="Activity Pointing Matrix">
+      <i class="fas fa-list-check"></i>
+      <span>Pointing</span>
+    </button>
+    <button type="button" class="bottom-nav-link" data-tab="tab-prayer" aria-label="Prayer Tracker">
+      <i class="fas fa-hands-praying"></i>
+      <span>Prayer</span>
+    </button>
+    <button type="button" id="btn-activity-more" class="bottom-nav-link" aria-label="More Options">
+      <i class="fas fa-ellipsis"></i>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <!-- ========================================== -->
+  <!-- MOBILE MORE ACTIONS BOTTOM SHEET (matching student.html design) -->
+  <!-- ========================================== -->
+  <div id="activity-more-sheet" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-200">
+    <div class="bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl border border-slate-200 animate-[slideUp_.2s_ease-out] space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+          <i class="fas fa-grid text-amber-500"></i> More Portal Features
+        </h3>
+        <button type="button" id="btn-close-activity-more" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition border-none cursor-pointer" aria-label="Close More Menu">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+      <div id="activity-more-sheet-items" class="grid grid-cols-2 gap-2.5">
+        <button type="button" class="p-3 sm:p-3.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-amber-50 hover:border-amber-200 transition flex flex-col items-center justify-center text-center gap-1.5 sm:gap-2 group cursor-pointer activity-more-tile" data-tab="tab-rewards">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white shadow-2xs border border-slate-200 flex items-center justify-center text-amber-500 text-base sm:text-lg group-hover:scale-110 transition">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <span class="font-extrabold text-[11px] sm:text-xs text-slate-800">Rewards &amp; Points</span>
+        </button>
+        <a href="official.html" class="p-3 sm:p-3.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-amber-50 hover:border-amber-200 transition flex flex-col items-center justify-center text-center gap-1.5 sm:gap-2 group cursor-pointer text-decoration-none">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white shadow-2xs border border-slate-200 flex items-center justify-center text-blue-600 text-base sm:text-lg group-hover:scale-110 transition">
+            <i class="fas fa-th-large"></i>
+          </div>
+          <span class="font-extrabold text-[11px] sm:text-xs text-slate-800">Official Hub</span>
+        </a>
+        <button type="button" id="mobile-more-logout-btn" class="p-3 sm:p-3.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-200 transition flex flex-col items-center justify-center text-center gap-1.5 sm:gap-2 group cursor-pointer col-span-2">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white shadow-2xs border border-slate-200 flex items-center justify-center text-rose-600 text-base sm:text-lg group-hover:scale-110 transition">
+            <i class="fas fa-power-off"></i>
+          </div>
+          <span class="font-extrabold text-[11px] sm:text-xs text-slate-800">Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated Module Script -->
+  <script type="module" src="scripts/pages/activity-page.js"></script>
+
+</body>
+</html>
